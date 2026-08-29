@@ -447,11 +447,11 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   var COL = {
     CATEGORY: 0, NAME: 1, DESC: 2, IMG_MAIN: 3,
     IMG2: 4, IMG3: 5, IMG4: 6, IMG5: 7, IMG6: 8, IMG7: 9, IMG8: 10, IMG9: 11,
-    FDA: 12, SKU: 13,
-    OPT1_NAME: 14, OPT1_VALUE: 15, OPT1_IMG: 16,
-    OPT2_NAME: 17, OPT2_VALUE: 18,
-    WEIGHT: 19, LENGTH: 20, WIDTH: 21, HEIGHT: 22,
-    PRICE: 23, QTY: 24
+    FDA: 12, LICENSE: 13, SKU: 14,
+    OPT1_NAME: 15, OPT1_VALUE: 16, OPT1_IMG: 17,
+    OPT2_NAME: 18, OPT2_VALUE: 19,
+    WEIGHT: 20, LENGTH: 21, WIDTH: 22, HEIGHT: 23,
+    PRICE: 24, QTY: 25
   };
   var HEADER_ROW = 0, FLAG_ROW = 1, DATA_START_ROW = 4; // 0-based; excel row = index + 1
 
@@ -639,6 +639,13 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         add(er, "error", COL.OPT2_NAME, "มีค่าตัวเลือกสินค้ารองแต่ไม่มีชื่อตัวเลือกสินค้ารอง", stripHtml(cell(row, COL.OPT2_VALUE)));
       } else if (opt2Name && !opt2Value) {
         add(er, "warning", COL.OPT2_VALUE, "มีชื่อตัวเลือกสินค้ารองแต่ไม่มีค่า ตรวจสอบว่าจำเป็นสำหรับสินค้านี้หรือไม่", stripHtml(cell(row, COL.OPT2_NAME)));
+      }
+      if (opt1Name && opt2Name) {
+        var opt1NameVal = stripHtml(cell(row, COL.OPT1_NAME));
+        var opt2NameVal = stripHtml(cell(row, COL.OPT2_NAME));
+        if (opt1NameVal === opt2NameVal) {
+          add(er, "error", COL.OPT2_NAME, "ชื่อตัวเลือกสินค้าหลักและชื่อตัวเลือกสินค้ารองซ้ำกัน (\"" + opt1NameVal + "\") — ต้องเป็นคนละชื่อกัน", opt2NameVal);
+        }
       }
 
       var nameForVariant = stripHtml(cell(row, COL.NAME));
