@@ -217,22 +217,28 @@
   }
   .grid-toolbar h2 { font-size: 16px; margin: 0; }
   .grid-table-wrap { max-height: 480px; }
-  #grid-table { font-size: 12.5px; }
+  /* table-layout:fixed is load-bearing here, not cosmetic: with the default
+     "auto" layout, the browser redistributes column widths based on content
+     across ALL 26+ raw-file columns every time cells wrap/expand, which was
+     shoving the sticky-positioned frozen columns' "left" offsets out of
+     sync with where their actual column boundary landed (columns visually
+     bunched together / data appearing to "stack" instead of sitting in its
+     own column). Fixed layout makes every column's width the single
+     declared number below, so the sticky math stays correct no matter what. */
+  #grid-table { font-size: 12.5px; table-layout: fixed; }
   #grid-table th, #grid-table td {
-    max-width: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  #grid-table th:nth-child(n+5), #grid-table td:nth-child(n+5) { width: 170px; }
 
   /* Freeze the first 4 columns (แถว / คอลัมน์ / ค่าที่พบ / ปัญหาที่พบ) so they
-     stay visible while scrolling right through the many raw-file columns.
-     Widths are fixed (not just max-width) because sticky "left" offsets
-     below must add up to a known number — auto-layout widths would drift. */
-  #grid-table th:nth-child(1), #grid-table td:nth-child(1) { width: 56px; min-width: 56px; max-width: 56px; }
-  #grid-table th:nth-child(2), #grid-table td:nth-child(2) { width: 150px; min-width: 150px; max-width: 150px; }
-  #grid-table th:nth-child(3), #grid-table td:nth-child(3) { width: 150px; min-width: 150px; max-width: 150px; }
-  #grid-table th:nth-child(4), #grid-table td:nth-child(4) { width: 340px; min-width: 340px; max-width: 340px; }
+     stay visible while scrolling right through the many raw-file columns. */
+  #grid-table th:nth-child(1), #grid-table td:nth-child(1) { width: 56px; }
+  #grid-table th:nth-child(2), #grid-table td:nth-child(2) { width: 150px; }
+  #grid-table th:nth-child(3), #grid-table td:nth-child(3) { width: 150px; }
+  #grid-table th:nth-child(4), #grid-table td:nth-child(4) { width: 250px; }
 
   #grid-table th:nth-child(-n+4), #grid-table td:nth-child(-n+4) {
     position: sticky;
