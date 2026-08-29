@@ -444,15 +444,69 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 (function () {
   "use strict";
 
-  var COL = {
-    CATEGORY: 0, NAME: 1, DESC: 2, IMG_MAIN: 3,
-    IMG2: 4, IMG3: 5, IMG4: 6, IMG5: 7, IMG6: 8, IMG7: 9, IMG8: 10, IMG9: 11,
-    FDA: 12, LICENSE: 13, SKU: 14,
-    OPT1_NAME: 15, OPT1_VALUE: 16, OPT1_IMG: 17,
-    OPT2_NAME: 18, OPT2_VALUE: 19,
-    WEIGHT: 20, LENGTH: 21, WIDTH: 22, HEIGHT: 23,
-    PRICE: 24, QTY: 25
-  };
+  // Column positions are NOT fixed: each product category ships its own
+  // version of the template with its own set of compliance-document columns
+  // (FDA/license/etc — different per category, sometimes absent entirely),
+  // which shifts every column after them. So structural columns are resolved
+  // by matching header TEXT at runtime (resolveColumns), not by hardcoded
+  // index. A field's labels are tried in order: exact match first, then
+  // "starts with", then "contains" — this tolerates per-category unit
+  // suffixes like "น้ำหนักพัสดุ(g)" vs "น้ำหนักพัสดุ(kg)".
+  var COLUMN_DEFS = [
+    { key: "CATEGORY", required: true, labels: ["หมวดหมู่"] },
+    { key: "NAME", required: true, labels: ["ชื่อสินค้า"] },
+    { key: "DESC", required: true, labels: ["คำอธิบายสินค้า"] },
+    { key: "IMG_MAIN", required: true, labels: ["ภาพหลัก"] },
+    { key: "IMG2", required: false, labels: ["ภาพ 2", "ภาพที่ 2"] },
+    { key: "IMG3", required: false, labels: ["ภาพ 3", "ภาพที่ 3"] },
+    { key: "IMG4", required: false, labels: ["ภาพ 4", "ภาพที่ 4"] },
+    { key: "IMG5", required: false, labels: ["ภาพ 5", "ภาพที่ 5"] },
+    { key: "IMG6", required: false, labels: ["ภาพ 6", "ภาพที่ 6"] },
+    { key: "IMG7", required: false, labels: ["ภาพ 7", "ภาพที่ 7"] },
+    { key: "IMG8", required: false, labels: ["ภาพ 8", "ภาพที่ 8"] },
+    { key: "IMG9", required: false, labels: ["ภาพ 9", "ภาพที่ 9"] },
+    { key: "SKU", required: false, labels: ["รหัส SKU", "SKU"] },
+    { key: "OPT1_NAME", required: true, labels: ["ชื่อตัวเลือกสินค้าหลัก"] },
+    { key: "OPT1_VALUE", required: true, labels: ["ค่าตัวเลือกสินค้าหลัก"] },
+    { key: "OPT1_IMG", required: false, labels: ["ตัวเลือกสินค้าหลักภาพที่ 1", "ภาพตัวเลือกสินค้าหลัก"] },
+    { key: "OPT2_NAME", required: true, labels: ["ชื่อตัวเลือกสินค้ารอง"] },
+    { key: "OPT2_VALUE", required: true, labels: ["ค่าตัวเลือกสินค้ารอง"] },
+    { key: "WEIGHT", required: true, labels: ["น้ำหนักพัสดุ"] },
+    { key: "LENGTH", required: true, labels: ["ความยาวของพัสดุ", "ความยาว"] },
+    { key: "WIDTH", required: true, labels: ["ความกว้างของพัสดุ", "ความกว้าง"] },
+    { key: "HEIGHT", required: true, labels: ["ความสูงของพัสดุ", "ความสูง"] },
+    { key: "PRICE", required: true, labels: ["ราคาขาย"] },
+    { key: "QTY", required: false, labels: ["ปริมาณ"] }
+  ];
+
+  function resolveColumns(headers) {
+    var normHeaders = headers.map(function (h) { return stripHtml(h); });
+    var used = {};
+    var col = {}, missingRequired = [];
+    COLUMN_DEFS.forEach(function (def) {
+      var found = -1;
+      ["exact", "startsWith", "includes"].some(function (mode) {
+        return def.labels.some(function (label) {
+          for (var i = 0; i < normHeaders.length; i++) {
+            if (used[i]) continue;
+            var h = normHeaders[i];
+            if (!h) continue;
+            var match = mode === "exact" ? h === label
+              : mode === "startsWith" ? h.indexOf(label) === 0
+              : h.indexOf(label) !== -1;
+            if (match) { found = i; return true; }
+          }
+          return false;
+        });
+      });
+      if (found !== -1) used[found] = true;
+      else if (def.required) missingRequired.push(def.labels[0]);
+      col[def.key] = found;
+    });
+    col.__missingRequired = missingRequired;
+    return col;
+  }
+
   var HEADER_ROW = 0, FLAG_ROW = 1, DATA_START_ROW = 4; // 0-based; excel row = index + 1
 
   function stripHtml(s) {
@@ -478,10 +532,26 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   function validate(aoa) {
     var headers = aoa[HEADER_ROW] || [];
     var flags = aoa[FLAG_ROW] || [];
+    var COL = resolveColumns(headers);
     var issues = [];
     var errRows = new Set(), warnRows = new Set(), checkedRows = 0;
     var categoryCount = {};
     var skuRows = {};
+
+    if (COL.__missingRequired.length > 0) {
+      issues.push({
+        row: HEADER_ROW + 1,
+        product: "",
+        severity: "warning",
+        column: "",
+        colIdx: null,
+        value: COL.__missingRequired.join(", "),
+        message: "ไม่พบคอลัมน์ต่อไปนี้ในไฟล์นี้ (หัวคอลัมน์อาจเขียนต่างจากที่ระบบรู้จัก): " +
+          COL.__missingRequired.join(", ") +
+          " — การตรวจสอบที่เกี่ยวข้องกับคอลัมน์เหล่านี้จะถูกข้ามไปทั้งหมด ไม่ใช่ว่าผ่านจริง"
+      });
+      warnRows.add(HEADER_ROW + 1);
+    }
 
     var dataRows = [];
     for (var r = DATA_START_ROW; r < aoa.length; r++) {
@@ -596,7 +666,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       var row = d.row, er = d.excelRow;
       checkedRows++;
 
-      for (var c = 0; c <= COL.QTY; c++) {
+      for (var c = 0; c < headers.length; c++) {
         var flag = String(flags[c] || "").trim();
         if (flag !== "บังคับ*") continue;
         if (c === COL.DESC) {
