@@ -827,12 +827,25 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   var searchInput = document.getElementById("search");
   var tabs = document.querySelectorAll(".tab");
 
+  // renderGrid() fully rebuilds gridBody's DOM on every search keystroke and
+  // every tab switch, which would otherwise silently collapse every cell the
+  // user just expanded. expandedCellKeys persists across those re-renders —
+  // renderGrid() consults it when building each <td>, the click handler
+  // below keeps it in sync.
+  var expandedCellKeys = new Set();
+
   // Delegated once (not per render, so it never accumulates duplicate
   // listeners as the grid re-renders on every filter/search change) —
   // click-to-expand/collapse for the message column and every raw data cell.
   gridBody.addEventListener("click", function (e) {
     var td = e.target.closest("td.expandable");
-    if (td) td.classList.toggle("expanded");
+    if (!td) return;
+    var key = td.dataset.cellKey;
+    var nowExpanded = td.classList.toggle("expanded");
+    if (key) {
+      if (nowExpanded) expandedCellKeys.add(key);
+      else expandedCellKeys.delete(key);
+    }
   });
 
   var currentIssues = [];
@@ -950,6 +963,9 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       msgTd.className = "msg expandable";
       msgTd.textContent = iss.message;
       msgTd.title = "คลิกเพื่อดูเต็ม/ย่อ";
+      var msgKey = "msg:" + iss.row + ":" + iss.colIdx + ":" + iss.message;
+      msgTd.dataset.cellKey = msgKey;
+      if (expandedCellKeys.has(msgKey)) msgTd.classList.add("expanded");
       tr.appendChild(msgTd);
 
       var rowData = rowByExcelRow[iss.row] || [];
@@ -959,6 +975,12 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         var display = raw == null ? "" : String(raw);
         td.textContent = display;
         td.className = "expandable";
+        // keyed by row+column only (not the specific issue) so expanding a
+        // data cell stays expanded even if the same row shows up again
+        // under a different issue/message
+        var dataKey = "data:" + iss.row + ":" + c;
+        td.dataset.cellKey = dataKey;
+        if (expandedCellKeys.has(dataKey)) td.classList.add("expanded");
         if (c === iss.colIdx) {
           td.classList.add(iss.severity === "error" ? "gcell-err" : "gcell-warn");
           td.title = display + "\n\n⚠ " + iss.message + "\n\n(คลิกเพื่อดูเต็ม/ย่อ)";
