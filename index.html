@@ -230,8 +230,8 @@
      Widths are fixed (not just max-width) because sticky "left" offsets
      below must add up to a known number — auto-layout widths would drift. */
   #grid-table th:nth-child(1), #grid-table td:nth-child(1) { width: 56px; min-width: 56px; max-width: 56px; }
-  #grid-table th:nth-child(2), #grid-table td:nth-child(2) { width: 200px; min-width: 200px; max-width: 200px; }
-  #grid-table th:nth-child(3), #grid-table td:nth-child(3) { width: 200px; min-width: 200px; max-width: 200px; }
+  #grid-table th:nth-child(2), #grid-table td:nth-child(2) { width: 150px; min-width: 150px; max-width: 150px; }
+  #grid-table th:nth-child(3), #grid-table td:nth-child(3) { width: 150px; min-width: 150px; max-width: 150px; }
   #grid-table th:nth-child(4), #grid-table td:nth-child(4) { width: 340px; min-width: 340px; max-width: 340px; }
 
   #grid-table th:nth-child(-n+4), #grid-table td:nth-child(-n+4) {
@@ -240,9 +240,9 @@
   }
   #grid-table th:nth-child(1), #grid-table td:nth-child(1) { left: 0; font-variant-numeric: tabular-nums; color: var(--ink-dim); }
   #grid-table th:nth-child(2), #grid-table td:nth-child(2) { left: 56px; }
-  #grid-table th:nth-child(3), #grid-table td:nth-child(3) { left: 256px; }
+  #grid-table th:nth-child(3), #grid-table td:nth-child(3) { left: 206px; }
   #grid-table th:nth-child(4), #grid-table td:nth-child(4) {
-    left: 456px;
+    left: 356px;
     box-shadow: 1px 0 0 var(--line), inset 0 -1px 0 0 var(--line);
   }
   #grid-table td:nth-child(-n+4) { background: var(--surface); }
@@ -251,20 +251,22 @@
   #grid-table td.gcell-err { background: var(--err-bg); color: var(--err); font-weight: 600; }
   #grid-table td.gcell-warn { background: var(--warn-bg); color: var(--warn); font-weight: 600; }
   #grid-table td.value {
-    max-width: none;
     white-space: normal;
-    overflow: visible;
+    overflow: hidden;
     text-overflow: unset;
   }
 
   /* Shared click-to-expand/collapse: the message column AND every raw data
-     column (long descriptions, image URLs, category paths, etc.) */
+     column (long descriptions, image URLs, category paths, etc.)
+     overflow stays hidden even when expanded — the cell just grows TALLER
+     to fit the wrapped text; "visible" here previously let long unbroken
+     strings (image URLs, category paths) bleed sideways over neighboring
+     (including frozen) columns instead of wrapping inside their own cell. */
   #grid-table td.expandable {
     cursor: pointer;
     white-space: normal;
-    overflow: visible;
+    overflow: hidden;
     text-overflow: unset;
-    max-width: none;
   }
   #grid-table td.expandable:not(.expanded) {
     display: -webkit-box;
