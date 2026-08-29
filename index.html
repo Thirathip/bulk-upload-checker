@@ -224,27 +224,49 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  #grid-table th:first-child, #grid-table td:first-child {
+
+  /* Freeze the first 4 columns (แถว / คอลัมน์ / ค่าที่พบ / ปัญหาที่พบ) so they
+     stay visible while scrolling right through the many raw-file columns.
+     Widths are fixed (not just max-width) because sticky "left" offsets
+     below must add up to a known number — auto-layout widths would drift. */
+  #grid-table th:nth-child(1), #grid-table td:nth-child(1) { width: 56px; min-width: 56px; max-width: 56px; }
+  #grid-table th:nth-child(2), #grid-table td:nth-child(2) { width: 200px; min-width: 200px; max-width: 200px; }
+  #grid-table th:nth-child(3), #grid-table td:nth-child(3) { width: 200px; min-width: 200px; max-width: 200px; }
+  #grid-table th:nth-child(4), #grid-table td:nth-child(4) { width: 340px; min-width: 340px; max-width: 340px; }
+
+  #grid-table th:nth-child(-n+4), #grid-table td:nth-child(-n+4) {
     position: sticky;
-    left: 0;
     z-index: 1;
-    max-width: none;
-    font-variant-numeric: tabular-nums;
-    color: var(--ink-dim);
+  }
+  #grid-table th:nth-child(1), #grid-table td:nth-child(1) { left: 0; font-variant-numeric: tabular-nums; color: var(--ink-dim); }
+  #grid-table th:nth-child(2), #grid-table td:nth-child(2) { left: 56px; }
+  #grid-table th:nth-child(3), #grid-table td:nth-child(3) { left: 256px; }
+  #grid-table th:nth-child(4), #grid-table td:nth-child(4) {
+    left: 456px;
     box-shadow: 1px 0 0 var(--line), inset 0 -1px 0 0 var(--line);
   }
-  #grid-table td:first-child { background: var(--surface); }
-  #grid-table th:first-child { background: var(--surface-2); z-index: 2; }
+  #grid-table td:nth-child(-n+4) { background: var(--surface); }
+  #grid-table th:nth-child(-n+4) { background: var(--surface-2); z-index: 2; }
+
   #grid-table td.gcell-err { background: var(--err-bg); color: var(--err); font-weight: 600; }
   #grid-table td.gcell-warn { background: var(--warn-bg); color: var(--warn); font-weight: 600; }
-  #grid-table td.value, #grid-table td.msg {
-    max-width: 280px;
+  #grid-table td.value {
+    max-width: none;
     white-space: normal;
     overflow: visible;
     text-overflow: unset;
   }
-  #grid-table td.msg { cursor: pointer; }
-  #grid-table td.msg:not(.expanded) {
+
+  /* Shared click-to-expand/collapse: the message column AND every raw data
+     column (long descriptions, image URLs, category paths, etc.) */
+  #grid-table td.expandable {
+    cursor: pointer;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    max-width: none;
+  }
+  #grid-table td.expandable:not(.expanded) {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -797,6 +819,14 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   var searchInput = document.getElementById("search");
   var tabs = document.querySelectorAll(".tab");
 
+  // Delegated once (not per render, so it never accumulates duplicate
+  // listeners as the grid re-renders on every filter/search change) —
+  // click-to-expand/collapse for the message column and every raw data cell.
+  gridBody.addEventListener("click", function (e) {
+    var td = e.target.closest("td.expandable");
+    if (td) td.classList.toggle("expanded");
+  });
+
   var currentIssues = [];
   var currentFilter = "error";
   var currentHeaders = [];
@@ -909,10 +939,9 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       tr.appendChild(valueTd);
 
       var msgTd = document.createElement("td");
-      msgTd.className = "msg";
+      msgTd.className = "msg expandable";
       msgTd.textContent = iss.message;
       msgTd.title = "คลิกเพื่อดูเต็ม/ย่อ";
-      msgTd.addEventListener("click", function () { msgTd.classList.toggle("expanded"); });
       tr.appendChild(msgTd);
 
       var rowData = rowByExcelRow[iss.row] || [];
@@ -921,11 +950,12 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         var raw = rowData[c];
         var display = raw == null ? "" : String(raw);
         td.textContent = display;
+        td.className = "expandable";
         if (c === iss.colIdx) {
           td.classList.add(iss.severity === "error" ? "gcell-err" : "gcell-warn");
-          td.title = display + "\n\n⚠ " + iss.message;
+          td.title = display + "\n\n⚠ " + iss.message + "\n\n(คลิกเพื่อดูเต็ม/ย่อ)";
         } else if (display) {
-          td.title = display;
+          td.title = display + "\n\n(คลิกเพื่อดูเต็ม/ย่อ)";
         }
         tr.appendChild(td);
       }
