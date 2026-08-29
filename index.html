@@ -274,7 +274,16 @@
     overflow: hidden;
     text-overflow: unset;
   }
-  #grid-table td.expandable:not(.expanded) {
+  /* The clamp lives on an inner <span>, never on the <td> itself: setting
+     display:-webkit-box directly on a table cell knocks it out of
+     display:table-cell, which breaks the table's column layout entirely
+     (every such cell collapses onto the same position instead of sitting
+     in its own column). The span can freely switch display since it isn't
+     part of the table layout. */
+  #grid-table td.expandable .clamp {
+    display: block;
+  }
+  #grid-table td.expandable:not(.expanded) .clamp {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -961,7 +970,10 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 
       var msgTd = document.createElement("td");
       msgTd.className = "msg expandable";
-      msgTd.textContent = iss.message;
+      var msgSpan = document.createElement("span");
+      msgSpan.className = "clamp";
+      msgSpan.textContent = iss.message;
+      msgTd.appendChild(msgSpan);
       msgTd.title = "คลิกเพื่อดูเต็ม/ย่อ";
       var msgKey = "msg:" + iss.row + ":" + iss.colIdx + ":" + iss.message;
       msgTd.dataset.cellKey = msgKey;
@@ -973,7 +985,10 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         var td = document.createElement("td");
         var raw = rowData[c];
         var display = raw == null ? "" : String(raw);
-        td.textContent = display;
+        var dataSpan = document.createElement("span");
+        dataSpan.className = "clamp";
+        dataSpan.textContent = display;
+        td.appendChild(dataSpan);
         td.className = "expandable";
         // keyed by row+column only (not the specific issue) so expanding a
         // data cell stays expanded even if the same row shows up again
