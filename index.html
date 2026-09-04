@@ -1094,7 +1094,15 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       tr.appendChild(rowTd);
 
       var colTd = document.createElement("td");
-      colTd.textContent = iss.column;
+      colTd.className = "expandable";
+      var colSpan = document.createElement("span");
+      colSpan.className = "clamp";
+      colSpan.textContent = iss.column;
+      colTd.appendChild(colSpan);
+      colTd.title = "คลิกเพื่อดูเต็ม/ย่อ";
+      var colKey = "col:" + iss.row + ":" + iss.colIdx;
+      colTd.dataset.cellKey = colKey;
+      if (expandedCellKeys.has(colKey)) colTd.classList.add("expanded");
       tr.appendChild(colTd);
 
       var valueTd = document.createElement("td");
