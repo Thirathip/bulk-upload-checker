@@ -318,6 +318,51 @@
   button.export:disabled { opacity: 0.4; cursor: not-allowed; }
   button.export:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
+  .col-manager { position: relative; }
+  .col-manager-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 5;
+    width: 260px;
+    max-height: 320px;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.25);
+    padding: 8px;
+  }
+  .col-manager-actions { display: flex; gap: 6px; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  .col-manager-actions button {
+    flex: 1;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--ink);
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .col-manager-actions button:hover { border-color: var(--accent); color: var(--accent-strong); }
+  .col-manager-list { display: flex; flex-direction: column; gap: 2px; }
+  .col-manager-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    color: var(--ink);
+  }
+  .col-manager-row:hover { background: var(--surface-2); }
+  .col-manager-row input { flex-shrink: 0; }
+  .col-manager-row span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .table-wrap {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -443,6 +488,16 @@
         </div>
         <div class="search-export">
           <input type="search" id="search" placeholder="ค้นหาชื่อสินค้า / เลขแถว…" />
+          <div class="col-manager">
+            <button class="export" id="col-manager-btn" type="button" aria-haspopup="true" aria-expanded="false">จัดการคอลัมน์</button>
+            <div class="col-manager-panel" id="col-manager-panel" hidden>
+              <div class="col-manager-actions">
+                <button type="button" id="col-manager-all">แสดงทั้งหมด</button>
+                <button type="button" id="col-manager-none">ซ่อนทั้งหมด</button>
+              </div>
+              <div class="col-manager-list" id="col-manager-list"></div>
+            </div>
+          </div>
           <button class="export" id="export-csv" disabled>ดาวน์โหลดรายการปัญหา (CSV)</button>
           <span class="highlight-status" id="csv-status" role="status"></span>
         </div>
@@ -870,6 +925,74 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   var currentHeaders = [];
   var currentDataRows = [];
 
+  // Indices (into currentHeaders) of raw-file columns the user hid via the
+  // column manager. Reset on every new file load since a different template
+  // has a different header set and stale indices would hide the wrong column.
+  var hiddenCols = new Set();
+
+  var colManagerBtn = document.getElementById("col-manager-btn");
+  var colManagerPanel = document.getElementById("col-manager-panel");
+  var colManagerList = document.getElementById("col-manager-list");
+
+  function updateColManagerBtnLabel() {
+    colManagerBtn.textContent = hiddenCols.size
+      ? "จัดการคอลัมน์ (ซ่อน " + hiddenCols.size + ")"
+      : "จัดการคอลัมน์";
+  }
+
+  function renderColManagerList() {
+    colManagerList.innerHTML = "";
+    var frag = document.createDocumentFragment();
+    currentHeaders.forEach(function (h, idx) {
+      var row = document.createElement("label");
+      row.className = "col-manager-row";
+      var cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = !hiddenCols.has(idx);
+      cb.addEventListener("change", function () {
+        if (cb.checked) hiddenCols.delete(idx);
+        else hiddenCols.add(idx);
+        updateColManagerBtnLabel();
+        renderGrid();
+      });
+      var span = document.createElement("span");
+      span.textContent = h || "(ไม่มีชื่อ)";
+      span.title = h || "";
+      row.appendChild(cb);
+      row.appendChild(span);
+      frag.appendChild(row);
+    });
+    colManagerList.appendChild(frag);
+    updateColManagerBtnLabel();
+  }
+
+  function closeColManagerPanel() {
+    colManagerPanel.hidden = true;
+    colManagerBtn.setAttribute("aria-expanded", "false");
+  }
+
+  colManagerBtn.addEventListener("click", function () {
+    var willOpen = colManagerPanel.hidden;
+    colManagerPanel.hidden = !willOpen;
+    colManagerBtn.setAttribute("aria-expanded", String(willOpen));
+  });
+  document.getElementById("col-manager-all").addEventListener("click", function () {
+    hiddenCols.clear();
+    renderColManagerList();
+    renderGrid();
+  });
+  document.getElementById("col-manager-none").addEventListener("click", function () {
+    currentHeaders.forEach(function (h, idx) { hiddenCols.add(idx); });
+    renderColManagerList();
+    renderGrid();
+  });
+  document.addEventListener("click", function (e) {
+    if (!colManagerPanel.hidden && !e.target.closest(".col-manager")) closeColManagerPanel();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !colManagerPanel.hidden) closeColManagerPanel();
+  });
+
   ["dragenter", "dragover"].forEach(function (ev) {
     dropEl.addEventListener(ev, function (e) { e.preventDefault(); dropEl.classList.add("drag"); });
   });
@@ -928,6 +1051,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     csvStatus.classList.remove("error");
     currentHeaders = result.headers;
     currentDataRows = result.dataRows;
+    hiddenCols.clear();
+    renderColManagerList();
     renderGrid();
   }
 
@@ -944,12 +1069,13 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     });
 
     var headFrag = document.createDocumentFragment();
-    [["แถว"], ["คอลัมน์"], ["ค่าที่พบ"], ["ปัญหาที่พบ"]].forEach(function (h) {
+    [["แถว"], ["ชื่อคอลัมน์ที่พบ"], ["ค่าที่พบ"], ["ปัญหาที่พบ"]].forEach(function (h) {
       var th = document.createElement("th");
       th.textContent = h[0];
       headFrag.appendChild(th);
     });
-    headers.forEach(function (h) {
+    headers.forEach(function (h, idx) {
+      if (hiddenCols.has(idx)) return;
       var th = document.createElement("th");
       th.textContent = h || "";
       th.title = h || "";
@@ -990,6 +1116,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 
       var rowData = rowByExcelRow[iss.row] || [];
       for (var c = 0; c < headers.length; c++) {
+        if (hiddenCols.has(c)) continue;
         var td = document.createElement("td");
         var raw = rowData[c];
         var display = raw == null ? "" : String(raw);
@@ -1080,7 +1207,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   }
 
   exportBtn.addEventListener("click", async function () {
-    var lines = [["แถว", "ชื่อสินค้า", "ระดับ", "คอลัมน์", "ค่าที่พบ", "ปัญหาที่พบ"].join(",")];
+    var lines = [["แถว", "ชื่อสินค้า", "ระดับ", "ชื่อคอลัมน์ที่พบ", "ค่าที่พบ", "ปัญหาที่พบ"].join(",")];
     currentIssues.forEach(function (iss) {
       var cells = [iss.row, iss.product, iss.severity, iss.column, iss.value, iss.message].map(function (v) {
         return '"' + String(v).replace(/"/g, '""') + '"';
