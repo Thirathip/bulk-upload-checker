@@ -1,0 +1,6 @@
+.env
+node_modules/
+.DS_Store
+thaimart-explore/storageState.json
+thaimart-explore/shots/
+thaimart-explore/downloads/

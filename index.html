@@ -456,17 +456,23 @@
   <details class="rules">
     <summary>ระบบตรวจอะไรบ้าง</summary>
     <ul>
+      <li><b>Error</b> — ไฟล์เทมเพลตผิดโครงสร้าง: น้อยกว่า 4 แถวแรก, ลบ/แก้ 4 แถวแรกของเทมเพลตทิ้ง, หรือมีคอลัมน์แปลกปลอมที่ไม่ใช่คอลัมน์มาตรฐานหรือคอลัมน์เอกสาร (ระบบจริงจะปฏิเสธทั้งไฟล์ในกรณีเหล่านี้)</li>
+      <li><b>Error</b> — ไม่พบข้อมูลสินค้าในไฟล์เลย</li>
       <li><b>Error</b> — คอลัมน์ที่แถว 2 ระบุ "บังคับ*" แต่ไม่มีข้อมูล (คอลัมน์คำอธิบายสินค้า ถ้ามีแต่แท็ก HTML/รูปโดยไม่มีตัวอักษรจริง ก็ถือว่าว่างเช่นกัน)</li>
       <li><b>Error</b> — ชื่อสินค้าสั้นกว่า 15 ตัวอักษร หรือยาวเกิน 255 ตัวอักษร</li>
-      <li><b>Error</b> — คำอธิบายสินค้ายาวเกิน 5000 ตัวอักษร</li>
-      <li><b>Error</b> — น้ำหนัก/ราคา ไม่ใช่ตัวเลข หรือน้อยกว่าเท่ากับ 0</li>
+      <li><b>Error</b> — คำอธิบายสินค้ายาวเกิน 10,000 ตัวอักษร</li>
+      <li><b>Error</b> — น้ำหนัก/ราคา/ปริมาณ/ขนาดพัสดุ ไม่ใช่จำนวนเต็ม หรือไม่อยู่ในช่วงที่กำหนด (น้ำหนัก 1–50,000 กรัม · ราคา 1–100,000 บาท · ปริมาณไม่เกิน 999,999 ชิ้น · แต่ละด้านของขนาดพัสดุไม่เกิน 150 cm และรวมกันไม่เกิน 280 cm)</li>
+      <li><b>Error</b> — รหัส SKU ยาวเกิน 100 ตัวอักษร หรือมีช่องว่างติดกันเกิน 1 ช่อง</li>
+      <li><b>Error</b> — ชื่อ/ค่าตัวเลือกสินค้า (หลักหรือรอง) ยาวเกิน 20 ตัวอักษร</li>
       <li><b>Error</b> — กรอกชื่อตัวเลือกสินค้าหลักแต่ไม่กรอกค่า (หรือกลับกัน) และขนาดพัสดุ (ยาว/กว้าง/สูง) กรอกไม่ครบทั้งสามช่อง</li>
       <li><b>Error</b> — สินค้าชื่อเดียวกัน มีค่าตัวเลือกสินค้า (ตัวเลือกหลัก + ตัวเลือกรอง) ซ้ำกันมากกว่า 1 แถว</li>
       <li><b>Error</b> — ไฟล์มีแถวข้อมูลสินค้าเกิน 500 แถว (ขีดจำกัดของเทมเพลต)</li>
       <li><b>Error</b> — สินค้าชื่อเดียวกันมี SKU (จำนวนแถว) เกิน 400 รายการ</li>
       <li><b>Error</b> — สินค้าที่มีทั้งตัวเลือกหลักและตัวเลือกรอง แถวไม่ครบตาม matrix ของทุกคู่ตัวเลือก (เช่น 2 สี × 2 ไซส์ ต้องมี 4 แถว)</li>
-      <li><b>Warning</b> — URL รูปภาพไม่ได้ขึ้นต้นด้วย http, รหัส SKU ซ้ำกันในไฟล์, หมวดหมู่ในบางแถวไม่ตรงกับส่วนใหญ่ของไฟล์, ชื่อสินค้าซ้ำแบบไม่ติดกัน (อาจถูกระบบรวมเป็นสินค้าเดียวผิดพลาด), ปริมาณไม่ใช่ตัวเลขหรือน้อยกว่าเท่ากับ 0 (แก้เป็น 0 ได้)</li>
+      <li><b>Error</b> — คอลัมน์เอกสารเฉพาะหมวดหมู่ (เช่น "เลข อย.", "ใบรับรอง") ว่าง หรือประเภทไม่ตรง (คอลัมน์แบบข้อความต้องไม่ใช่ลิงก์ URL, คอลัมน์แบบไฟล์แนบต้องเป็นลิงก์ URL ที่ถูกต้อง)</li>
+      <li><b>Warning</b> — URL รูปภาพไม่ได้ขึ้นต้นด้วย http, รหัส SKU ซ้ำกันในไฟล์, หมวดหมู่ในบางแถวไม่ตรงกับส่วนใหญ่ของไฟล์, ชื่อสินค้าซ้ำแบบไม่ติดกัน (อาจถูกระบบรวมเป็นสินค้าเดียวผิดพลาด)</li>
       <li>แถวที่ว่างทั้งแถวจะไม่ถูกนับและไม่ถูกตรวจ</li>
+      <li class="note-src">กฎอิงตามสเปกตรวจสอบจริงของระบบ Thaimart (นำเข้าสินค้าแบบ bulk + ฟอร์มเพิ่มสินค้า) — คอลัมน์เอกสารเฉพาะหมวดหมู่ตรวจจากชื่อคอลัมน์ที่ลงท้ายด้วย "(text)"/"(link file)" เท่านั้น ไม่ได้รู้ล่วงหน้าว่าแต่ละหมวดหมู่บังคับเอกสารอะไรบ้าง</li>
     </ul>
   </details>
 
@@ -500,6 +506,8 @@
           </div>
           <button class="export" id="export-csv" disabled>ดาวน์โหลดรายการปัญหา (CSV)</button>
           <span class="highlight-status" id="csv-status" role="status"></span>
+          <button class="export" id="export-matrix-fix" disabled hidden>ดาวน์โหลดตัวเลือกที่ขาด (.xlsx)</button>
+          <span class="highlight-status" id="matrix-fix-status" role="status"></span>
         </div>
       </div>
       <div class="table-wrap grid-table-wrap">
@@ -570,7 +578,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     { key: "WIDTH", required: true, labels: ["ความกว้างของพัสดุ", "ความกว้าง"] },
     { key: "HEIGHT", required: true, labels: ["ความสูงของพัสดุ", "ความสูง"] },
     { key: "PRICE", required: true, labels: ["ราคาขาย"] },
-    { key: "QTY", required: false, labels: ["ปริมาณ"] }
+    { key: "QTY", required: true, labels: ["ปริมาณ"] }
   ];
 
   function resolveColumns(headers) {
@@ -598,7 +606,28 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       col[def.key] = found;
     });
     col.__missingRequired = missingRequired;
+    col.__usedIndices = Object.keys(used).map(Number);
     return col;
+  }
+
+  // Compliance-document columns (FDA/license/etc) are appended after "ภาพ 9"
+  // by the real template generator and carry the literal suffix "(text)" or
+  // "(link file)" — the doc's own name plus that type marker. That suffix is
+  // the only reliable, category-agnostic way to spot them (we don't have a
+  // per-category list of which docs exist), and it's also how we tell a real
+  // compliance column apart from a genuinely foreign one a seller typed in.
+  function resolveComplianceColumns(headers) {
+    var cols = [];
+    headers.forEach(function (h, i) {
+      var text = stripHtml(h);
+      if (!text) return;
+      var isLink = /\(\s*link\s*file\s*\)\s*$/i.test(text);
+      var isText = !isLink && /\(\s*text\s*\)\s*$/i.test(text);
+      if (!isLink && !isText) return;
+      var label = text.replace(/\s*\(\s*(link\s*file|text)\s*\)\s*$/i, "").trim();
+      cols.push({ idx: i, label: label || text, type: isLink ? "link" : "text" });
+    });
+    return cols;
   }
 
   var HEADER_ROW = 0, FLAG_ROW = 1, DATA_START_ROW = 4; // 0-based; excel row = index + 1
@@ -627,10 +656,37 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     var headers = aoa[HEADER_ROW] || [];
     var flags = aoa[FLAG_ROW] || [];
     var COL = resolveColumns(headers);
+    var complianceCols = resolveComplianceColumns(headers);
     var issues = [];
     var errRows = new Set(), warnRows = new Set(), checkedRows = 0;
+    var matrixFixes = [];
     var categoryCount = {};
     var skuRows = {};
+
+    // Real system rule: the template's first 4 rows (header / mandatory-flag /
+    // description / example) are fixed and the whole file is rejected outright
+    // if any of them is missing or blanked out — no row number is reported for
+    // this one, it's a whole-file rejection.
+    if (aoa.length < 4) {
+      issues.push({
+        row: HEADER_ROW + 1, product: "", severity: "error", column: "", colIdx: null, value: "",
+        message: "ไฟล์เทมเพลตไม่ถูกต้อง กรุณาใช้เทมเพลตที่ดาวน์โหลดจากระบบ (ไฟล์มีน้อยกว่า 4 แถวแรกที่เทมเพลตกำหนด)"
+      });
+      errRows.add(HEADER_ROW + 1);
+    } else {
+      for (var fr = 0; fr < 4; fr++) {
+        var fRow = aoa[fr] || [];
+        var fHasAny = fRow.some(function (v) { return stripHtml(v) !== ""; });
+        if (!fHasAny) {
+          issues.push({
+            row: fr + 1, product: "", severity: "error", column: "", colIdx: null, value: "",
+            message: "ไฟล์เทมเพลตไม่ถูกต้อง กรุณาใช้เทมเพลตที่ดาวน์โหลดจากระบบ (ห้ามแก้ไขหรือลบ 4 แถวแรก — แถวที่ " + (fr + 1) + " ว่างทั้งแถว)"
+          });
+          errRows.add(fr + 1);
+          break;
+        }
+      }
+    }
 
     if (COL.__missingRequired.length > 0) {
       issues.push({
@@ -647,12 +703,46 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       warnRows.add(HEADER_ROW + 1);
     }
 
+    // Real system rejects the whole file if it finds ANY header that isn't a
+    // standard column and isn't a compliance-document column either — sellers
+    // who add their own notes column (e.g. "หมายเหตุ", "ต้นทุน") lose the
+    // whole import, not just that column.
+    (function () {
+      var usedSet = {};
+      COL.__usedIndices.forEach(function (i) { usedSet[i] = true; });
+      var complianceSet = {};
+      complianceCols.forEach(function (c) { complianceSet[c.idx] = true; });
+      var foreign = [];
+      headers.forEach(function (h, i) {
+        if (usedSet[i] || complianceSet[i]) return;
+        var text = stripHtml(h);
+        if (text) foreign.push(text);
+      });
+      if (foreign.length > 0) {
+        issues.push({
+          row: HEADER_ROW + 1, product: "", severity: "error", column: "", colIdx: null,
+          value: foreign.join(", "),
+          message: "ไฟล์เทมเพลตไม่ถูกต้อง (พบคอลัมน์ " + foreign.map(function (c) { return "\"" + c + "\""; }).join(", ") +
+            " ที่ไม่อยู่ในเทมเพลตของหมวดหมู่นี้) — ระบบจริงจะปฏิเสธทั้งไฟล์เมื่อมีคอลัมน์แปลกปลอม ต้องลบคอลัมน์นี้ออกก่อนอัปโหลด"
+        });
+        errRows.add(HEADER_ROW + 1);
+      }
+    })();
+
     var dataRows = [];
     for (var r = DATA_START_ROW; r < aoa.length; r++) {
       var row = aoa[r] || [];
       var hasAny = row.some(function (v) { return stripHtml(v) !== ""; });
       if (!hasAny) continue;
       dataRows.push({ excelRow: r + 1, row: row });
+    }
+
+    if (dataRows.length === 0) {
+      issues.push({
+        row: DATA_START_ROW + 1, product: "", severity: "error", column: "", colIdx: null, value: "",
+        message: "ไม่พบข้อมูลสินค้าในไฟล์ กรุณากรอกข้อมูลอย่างน้อย 1 รายการ"
+      });
+      errRows.add(DATA_START_ROW + 1);
     }
 
     dataRows.forEach(function (d) {
@@ -738,6 +828,43 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
             "ตัวเลือกสินค้าของสินค้า \"" + run.name + "\" ไม่ครบตาม matrix — ต้องมี " + expected +
             " แถว (ตัวเลือกหลัก " + d1Count + " ค่า × ตัวเลือกรอง " + d2Count + " ค่า) แต่พบ " + matrixRows.length + " แถว",
             Object.keys(d1).join(", ") + " × " + Object.keys(d2).join(", "));
+
+          // Build a ready-to-paste replacement block for this product: reuse
+          // each existing row as-is where its combo already exists, and
+          // synthesize a new row (option columns filled in, everything else
+          // copied from the group's first row) for every combo that's missing
+          // — so fixing this error is "paste the generated rows over the old
+          // ones", not "manually work out which of the 66 pairs are absent".
+          var opt1List = Object.keys(d1), opt2List = Object.keys(d2);
+          var rowByCombo = {};
+          var opt1ImgByValue = {};
+          matrixRows.forEach(function (d) {
+            var v1 = stripHtml(cell(d.row, COL.OPT1_VALUE));
+            var v2 = stripHtml(cell(d.row, COL.OPT2_VALUE));
+            rowByCombo[v1 + "|" + v2] = d;
+            if (COL.OPT1_IMG !== -1 && !opt1ImgByValue[v1]) {
+              var img = cell(d.row, COL.OPT1_IMG);
+              if (stripHtml(img)) opt1ImgByValue[v1] = img;
+            }
+          });
+          var templateRow = group[0].row;
+          var fixRows = [];
+          opt1List.forEach(function (v1) {
+            opt2List.forEach(function (v2) {
+              var existing = rowByCombo[v1 + "|" + v2];
+              if (existing) {
+                fixRows.push({ cells: existing.row.slice(), note: "จากไฟล์เดิม (แถว " + existing.excelRow + ")" });
+                return;
+              }
+              var cells = templateRow.slice();
+              cells[COL.OPT1_VALUE] = v1;
+              cells[COL.OPT2_VALUE] = v2;
+              if (COL.SKU !== -1) cells[COL.SKU] = "";
+              if (COL.OPT1_IMG !== -1) cells[COL.OPT1_IMG] = opt1ImgByValue[v1] || "";
+              fixRows.push({ cells: cells, note: "แถวใหม่ที่ต้องเติม (" + v1 + " × " + v2 + ")" });
+            });
+          });
+          matrixFixes.push({ name: run.name, expected: expected, found: matrixRows.length, rows: fixRows });
         }
       }
     });
@@ -783,21 +910,33 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       }
       if (filled(row, COL.DESC)) {
         var descLen = stripHtml(cell(row, COL.DESC)).length;
-        if (descLen > 5000) add(er, "error", COL.DESC, "คำอธิบายสินค้ายาวเกิน 5000 ตัวอักษร (พบ " + descLen + " ตัวอักษร)", descLen + " ตัวอักษร");
+        if (descLen > 10000) add(er, "error", COL.DESC, "คำอธิบายสินค้ายาวเกิน 10,000 ตัวอักษร (พบ " + descLen + " ตัวอักษร)", descLen + " ตัวอักษร");
       }
 
-      [[COL.WEIGHT, "น้ำหนักพัสดุ"], [COL.PRICE, "ราคาขาย"]].forEach(function (pair) {
-        var v = cell(row, pair[0]);
+      (function () {
+        var v = cell(row, COL.WEIGHT);
         if (String(v).trim() === "") return;
         var n = toNumber(v);
-        if (isNaN(n) || n <= 0) add(er, "error", pair[0], pair[1] + " ต้องเป็นตัวเลขมากกว่า 0 (พบ \"" + v + "\")", String(v));
-      });
+        if (isNaN(n) || !Number.isInteger(n)) add(er, "error", COL.WEIGHT, "น้ำหนักพัสดุ ต้องเป็นจำนวนเต็ม (พบ \"" + v + "\")", String(v));
+        else if (n <= 0) add(er, "error", COL.WEIGHT, "น้ำหนักพัสดุ ต้องมากกว่า 0 กรัม (พบ \"" + v + "\")", String(v));
+        else if (n > 50000) add(er, "error", COL.WEIGHT, "น้ำหนักพัสดุ ต้องไม่เกิน 50,000 กรัม (พบ \"" + v + "\")", String(v));
+      })();
+
+      (function () {
+        var v = cell(row, COL.PRICE);
+        if (String(v).trim() === "") return;
+        var n = toNumber(v);
+        if (isNaN(n) || !Number.isInteger(n)) add(er, "error", COL.PRICE, "ราคาขาย ต้องเป็นจำนวนเต็ม (พบ \"" + v + "\")", String(v));
+        else if (n < 1 || n > 100000) add(er, "error", COL.PRICE, "ราคาขาย ต้องไม่ต่ำกว่า 1 บาท และไม่เกิน 100,000 บาท (พบ \"" + v + "\")", String(v));
+      })();
 
       var qtyRaw = cell(row, COL.QTY);
       if (String(qtyRaw).trim() !== "") {
         var qtyNum = toNumber(qtyRaw);
-        if (isNaN(qtyNum) || qtyNum <= 0) {
-          add(er, "warning", COL.QTY, "ปริมาณไม่ใช่ตัวเลข หรือน้อยกว่าเท่ากับ 0 (พบ \"" + qtyRaw + "\") — แก้เป็น 0 ได้", String(qtyRaw));
+        if (isNaN(qtyNum) || !Number.isInteger(qtyNum) || qtyNum < 0) {
+          add(er, "error", COL.QTY, "ปริมาณ ต้องเป็นจำนวนเต็ม (พบ \"" + qtyRaw + "\")", String(qtyRaw));
+        } else if (qtyNum > 999999) {
+          add(er, "error", COL.QTY, "ปริมาณ ต้องไม่เกิน 999,999 ชิ้น (พบ \"" + qtyRaw + "\")", String(qtyRaw));
         }
       }
 
@@ -819,6 +958,16 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
           add(er, "error", COL.OPT2_NAME, "ชื่อตัวเลือกสินค้าหลักและชื่อตัวเลือกสินค้ารองซ้ำกัน (\"" + opt1NameVal + "\") — ต้องเป็นคนละชื่อกัน", opt2NameVal);
         }
       }
+      [
+        [opt1Name, COL.OPT1_NAME, "ชื่อตัวเลือกสินค้าหลัก"],
+        [opt1Value, COL.OPT1_VALUE, "ค่าตัวเลือกสินค้าหลัก"],
+        [opt2Name, COL.OPT2_NAME, "ชื่อตัวเลือกสินค้ารอง"],
+        [opt2Value, COL.OPT2_VALUE, "ค่าตัวเลือกสินค้ารอง"]
+      ].forEach(function (t) {
+        if (!t[0]) return;
+        var s = stripHtml(cell(row, t[1]));
+        if (s.length > 20) add(er, "error", t[1], t[2] + " ยาวเกิน 20 ตัวอักษร (พบ " + s.length + " ตัวอักษร)", s);
+      });
 
       var nameForVariant = stripHtml(cell(row, COL.NAME));
       var v1ForVariant = stripHtml(cell(row, COL.OPT1_VALUE));
@@ -837,17 +986,48 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       }
 
       var dims = [COL.LENGTH, COL.WIDTH, COL.HEIGHT];
+      var dimLabels = ["ความยาวของพัสดุ", "ความกว้างของพัสดุ", "ความสูงของพัสดุ"];
       var dimsFilled = dims.map(function (i) { return filled(row, i); });
       var dimsFilledCount = dimsFilled.filter(Boolean).length;
       if (dimsFilledCount > 0 && dimsFilledCount < 3) {
-        add(er, "error", dims[dimsFilled.indexOf(false)], "ต้องกรอกขนาดพัสดุให้ครบทั้งยาว/กว้าง/สูง",
+        add(er, "error", dims[dimsFilled.indexOf(false)], "ต้องกรอกขนาดพัสดุให้ครบทั้งยาว/กว้าง/สูง หรือเว้นว่างทั้งหมด",
           dims.map(function (i) { return cell(row, i) === "" ? "-" : String(cell(row, i)); }).join(" × "));
       } else if (dimsFilledCount === 3) {
-        dims.forEach(function (i) {
-          var n = toNumber(cell(row, i));
-          if (isNaN(n) || n <= 0) add(er, "error", i, "ต้องเป็นตัวเลขมากกว่า 0", String(cell(row, i)));
+        var dimNums = dims.map(function (i) { return toNumber(cell(row, i)); });
+        var dimsOk = true;
+        dims.forEach(function (i, k) {
+          var n = dimNums[k];
+          if (isNaN(n) || !Number.isInteger(n)) {
+            add(er, "error", i, dimLabels[k] + " ต้องเป็นจำนวนเต็ม (พบ \"" + cell(row, i) + "\")", String(cell(row, i)));
+            dimsOk = false;
+          } else if (n <= 0) {
+            add(er, "error", i, dimLabels[k] + " ต้องมากกว่า 0 cm", String(cell(row, i)));
+            dimsOk = false;
+          } else if (n > 150) {
+            add(er, "error", i, dimLabels[k] + " ต้องไม่เกิน 150 cm", String(cell(row, i)));
+            dimsOk = false;
+          }
         });
+        if (dimsOk && (dimNums[0] + dimNums[1] + dimNums[2]) > 280) {
+          var dimSum = dimNums[0] + dimNums[1] + dimNums[2];
+          add(er, "error", dims[0], "ขนาดรวม (ยาว + กว้าง + สูง) ต้องไม่เกิน 280 cm (พบรวม " + dimSum + " cm)",
+            dimNums.join(" + ") + " = " + dimSum);
+        }
       }
+
+      complianceCols.forEach(function (c) {
+        var val = stripHtml(cell(row, c.idx));
+        if (val === "") {
+          add(er, "error", c.idx, "คอลัมน์ \"" + c.label + "\" ห้ามเว้นว่าง", "");
+          return;
+        }
+        var looksLikeUrl = /^https?:\/\//i.test(val);
+        if (c.type === "link" && !looksLikeUrl) {
+          add(er, "error", c.idx, "คอลัมน์ \"" + c.label + "\" ต้องเป็นลิงก์ URL ที่ถูกต้อง (ขึ้นต้นด้วย http:// หรือ https://)", val);
+        } else if (c.type === "text" && looksLikeUrl) {
+          add(er, "error", c.idx, "คอลัมน์ \"" + c.label + "\" ต้องเป็นข้อความ ไม่ใช่ลิงก์ URL", val);
+        }
+      });
 
       [COL.IMG_MAIN, COL.IMG2, COL.IMG3, COL.IMG4, COL.IMG5, COL.IMG6, COL.IMG7, COL.IMG8, COL.IMG9, COL.OPT1_IMG].forEach(function (i) {
         var v = cell(row, i);
@@ -862,6 +1042,10 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       }
 
       var sku = stripHtml(cell(row, COL.SKU));
+      if (sku) {
+        if (sku.length > 100) add(er, "error", COL.SKU, "รหัส SKU ยาวเกิน 100 ตัวอักษร (พบ " + sku.length + " ตัวอักษร)", sku);
+        if (/ {2,}/.test(sku)) add(er, "error", COL.SKU, "คอลัมน์ \"รหัส SKU\" เว้นวรรคได้ครั้งละ 1 ช่องเท่านั้น", sku);
+      }
       if (sku && skuRows[sku] && skuRows[sku].length > 1) {
         add(er, "warning", COL.SKU, "รหัส SKU ซ้ำกับแถวอื่น (แถว " + skuRows[sku].filter(function (x) { return x !== er; }).join(", ") + ")", sku);
       }
@@ -872,16 +1056,28 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       iss.product = d ? stripHtml(cell(d.row, COL.NAME)) || "(ไม่มีชื่อ)" : "";
     });
 
-    var passRows = checkedRows - new Set([].concat(Array.from(errRows), Array.from(warnRows))).size;
+    // errRows/warnRows also carry file-level issues anchored at rows 1–4 (bad
+    // template structure, foreign columns, missing columns) which aren't real
+    // data rows and were never counted into checkedRows — only count rows that
+    // are actual data rows here, or a file-level issue would silently deflate
+    // (even negate) the pass count.
+    var dataRowNumbers = new Set(dataRows.map(function (d) { return d.excelRow; }));
+    var badDataRows = new Set(
+      [].concat(Array.from(errRows), Array.from(warnRows)).filter(function (r) { return dataRowNumbers.has(r); })
+    );
+    var passRows = checkedRows - badDataRows.size;
+    var errDataRows = new Set(Array.from(errRows).filter(function (r) { return dataRowNumbers.has(r); }));
+    var warnDataRows = new Set(Array.from(warnRows).filter(function (r) { return dataRowNumbers.has(r); }));
 
     return {
       totalChecked: checkedRows,
-      errorCount: errRows.size,
-      warningOnlyCount: new Set(Array.from(warnRows).filter(function (r) { return !errRows.has(r); })).size,
+      errorCount: errDataRows.size,
+      warningOnlyCount: new Set(Array.from(warnDataRows).filter(function (r) { return !errDataRows.has(r); })).size,
       passCount: passRows,
       issues: issues.sort(function (a, b) { return a.row - b.row; }),
       headers: headers,
-      dataRows: dataRows
+      dataRows: dataRows,
+      matrixFixes: matrixFixes
     };
   }
 
@@ -924,6 +1120,9 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   var currentFilter = "error";
   var currentHeaders = [];
   var currentDataRows = [];
+  var currentMatrixFixes = [];
+  var matrixFixBtn = document.getElementById("export-matrix-fix");
+  var matrixFixStatus = document.getElementById("matrix-fix-status");
 
   // Indices (into currentHeaders) of raw-file columns the user hid via the
   // column manager. Reset on every new file load since a different template
@@ -1049,6 +1248,14 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     exportBtn.disabled = currentIssues.length === 0;
     csvStatus.textContent = "";
     csvStatus.classList.remove("error");
+    currentMatrixFixes = result.matrixFixes || [];
+    matrixFixBtn.hidden = currentMatrixFixes.length === 0;
+    matrixFixBtn.disabled = currentMatrixFixes.length === 0;
+    matrixFixBtn.textContent = currentMatrixFixes.length
+      ? "ดาวน์โหลดตัวเลือกที่ขาด (.xlsx) — " + currentMatrixFixes.length + " สินค้า"
+      : "ดาวน์โหลดตัวเลือกที่ขาด (.xlsx)";
+    matrixFixStatus.textContent = "";
+    matrixFixStatus.classList.remove("error");
     currentHeaders = result.headers;
     currentDataRows = result.dataRows;
     hiddenCols.clear();
@@ -1250,6 +1457,54 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     }
     csvStatus.textContent = "ดาวน์โหลดไม่สำเร็จ: " + (result.message || result.code);
     csvStatus.classList.add("error");
+  });
+
+  // Binary files (.xlsx) have no sensible ".txt" fallback the way the CSV
+  // export does, so on any failure of window.claude.downloads this just
+  // drops straight to a plain browser download instead of renaming.
+  async function saveBinaryFile(filename, blob) {
+    if (window.claude && window.claude.downloads) {
+      try {
+        await window.claude.downloads.save({ filename: filename, data: blob });
+        return { ok: true, filename: filename };
+      } catch (err) { /* fall through to plain browser download */ }
+    }
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    return { ok: true, filename: filename, viaBrowser: true };
+  }
+
+  matrixFixBtn.addEventListener("click", async function () {
+    if (!currentMatrixFixes.length) return;
+    var headerRow = currentHeaders.slice();
+    var noteColIdx = headerRow.length;
+    headerRow.push("หมายเหตุจากตัวตรวจ (ลบคอลัมน์นี้ก่อนคัดลอกไปเทมเพลตจริง)");
+    var aoaOut = [headerRow];
+    currentMatrixFixes.forEach(function (fix, fixIdx) {
+      if (fixIdx > 0) aoaOut.push([]); // blank row between products
+      fix.rows.forEach(function (r) {
+        var line = r.cells.slice();
+        line[noteColIdx] = fix.name + " — " + r.note;
+        aoaOut.push(line);
+      });
+    });
+
+    var ws = XLSX.utils.aoa_to_sheet(aoaOut);
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "ตัวเลือกที่ต้องเติม");
+    var wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    var blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+    matrixFixStatus.textContent = "";
+    matrixFixStatus.classList.remove("error");
+    var result = await saveBinaryFile("bulk-upload-option-fix.xlsx", blob);
+    matrixFixStatus.textContent = result.viaBrowser ? "ดาวน์โหลดไฟล์แล้ว" : "เซฟไฟล์แล้ว";
   });
 })();
 </script>
