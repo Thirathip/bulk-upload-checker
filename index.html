@@ -289,6 +289,20 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+  .expand-toggle {
+    display: block;
+    margin-top: 6px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink-dim);
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 11.5px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .expand-toggle:hover { border-color: var(--accent); color: var(--accent-strong); }
+  .expand-toggle:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
   .grid-legend { display: flex; gap: 14px; margin-top: 8px; font-size: 12px; color: var(--ink-dim); }
   .grid-legend span { display: inline-flex; align-items: center; gap: 5px; }
   .grid-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
@@ -470,7 +484,7 @@
       <li><b>Error</b> — สินค้าชื่อเดียวกันมี SKU (จำนวนแถว) เกิน 400 รายการ</li>
       <li><b>Error</b> — สินค้าที่มีทั้งตัวเลือกหลักและตัวเลือกรอง แถวไม่ครบตาม matrix ของทุกคู่ตัวเลือก (เช่น 2 สี × 2 ไซส์ ต้องมี 4 แถว)</li>
       <li><b>Error</b> — คอลัมน์เอกสารเฉพาะหมวดหมู่ (เช่น "เลข อย.", "ใบรับรอง") ว่าง หรือประเภทไม่ตรง (คอลัมน์แบบข้อความต้องไม่ใช่ลิงก์ URL, คอลัมน์แบบไฟล์แนบต้องเป็นลิงก์ URL ที่ถูกต้อง)</li>
-      <li><b>Warning</b> — URL รูปภาพไม่ได้ขึ้นต้นด้วย http, รหัส SKU ซ้ำกันในไฟล์, หมวดหมู่ในบางแถวไม่ตรงกับส่วนใหญ่ของไฟล์, ชื่อสินค้าซ้ำแบบไม่ติดกัน (อาจถูกระบบรวมเป็นสินค้าเดียวผิดพลาด)</li>
+      <li><b>Warning</b> — URL รูปภาพไม่ได้ขึ้นต้นด้วย http, หมวดหมู่ในบางแถวไม่ตรงกับส่วนใหญ่ของไฟล์, ชื่อสินค้าซ้ำแบบไม่ติดกัน (อาจถูกระบบรวมเป็นสินค้าเดียวผิดพลาด), ค่าตัวเลือกสินค้าสะกดต่างกันแค่ตัวพิมพ์เล็ก-ใหญ่ (เช่น "Af" กับ "AF")</li>
       <li>แถวที่ว่างทั้งแถวจะไม่ถูกนับและไม่ถูกตรวจ</li>
       <li class="note-src">กฎอิงตามสเปกตรวจสอบจริงของระบบ Thaimart (นำเข้าสินค้าแบบ bulk + ฟอร์มเพิ่มสินค้า) — คอลัมน์เอกสารเฉพาะหมวดหมู่ตรวจจากชื่อคอลัมน์ที่ลงท้ายด้วย "(text)"/"(link file)" เท่านั้น ไม่ได้รู้ล่วงหน้าว่าแต่ละหมวดหมู่บังคับเอกสารอะไรบ้าง</li>
     </ul>
@@ -661,7 +675,6 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     var errRows = new Set(), warnRows = new Set(), checkedRows = 0;
     var matrixFixes = [];
     var categoryCount = {};
-    var skuRows = {};
 
     // Real system rule: the template's first 4 rows (header / mandatory-flag /
     // description / example) are fixed and the whole file is rejected outright
@@ -753,11 +766,6 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       return categoryCount[b] - categoryCount[a];
     })[0];
 
-    dataRows.forEach(function (d) {
-      var sku = stripHtml(cell(d.row, COL.SKU));
-      if (sku) { (skuRows[sku] = skuRows[sku] || []).push(d.excelRow); }
-    });
-
     // Product boundaries are contiguous same-name blocks only: two rows with
     // the same "ชื่อสินค้า" that are NOT next to each other are treated by the
     // real system as two separate products, not one grouped/merged product.
@@ -782,7 +790,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       });
     });
 
-    function add(excelRow, severity, colIdx, message, value) {
+    function add(excelRow, severity, colIdx, message, value, rangeLabel) {
       issues.push({
         row: excelRow,
         product: "",
@@ -790,7 +798,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         column: colIdx != null ? headers[colIdx] : "",
         colIdx: colIdx != null ? colIdx : null,
         value: value || "",
-        message: message
+        message: message,
+        rangeLabel: rangeLabel || null
       });
       if (severity === "error") errRows.add(excelRow);
       else warnRows.add(excelRow);
@@ -823,11 +832,42 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         });
         var d1Count = Object.keys(d1).length, d2Count = Object.keys(d2).length;
         var expected = d1Count * d2Count;
+
+        // "Af" vs "AF" typed inconsistently across rows counts as 2 distinct
+        // values here (matrix math stays case-sensitive — we don't know that
+        // the real system treats them as equal), which can make an otherwise-
+        // complete matrix look short. Surface the likely typo directly so the
+        // real cause is obvious instead of just an inflated expected count.
+        function caseCollisions(valueSet) {
+          var byLower = {};
+          Object.keys(valueSet).forEach(function (v) {
+            var k = v.trim().toLowerCase();
+            (byLower[k] = byLower[k] || []).push(v);
+          });
+          return Object.keys(byLower).map(function (k) { return byLower[k]; }).filter(function (g) { return g.length > 1; });
+        }
+        caseCollisions(d1).forEach(function (group) {
+          add(matrixRows[0].excelRow, "warning", COL.OPT1_VALUE,
+            "ค่าตัวเลือกสินค้าหลัก " + group.map(function (v) { return "\"" + v + "\""; }).join(" กับ ") +
+            " สะกดต่างกันแค่ตัวพิมพ์เล็ก-ใหญ่ — ถ้าตั้งใจให้เป็นค่าเดียวกัน ต้องพิมพ์ให้เหมือนกันทุกแถว ไม่งั้นระบบอาจมองเป็นคนละตัวเลือก ทำให้ตัวเลือกไม่ครบ matrix",
+            group.join(", "));
+        });
+        caseCollisions(d2).forEach(function (group) {
+          add(matrixRows[0].excelRow, "warning", COL.OPT2_VALUE,
+            "ค่าตัวเลือกสินค้ารอง " + group.map(function (v) { return "\"" + v + "\""; }).join(" กับ ") +
+            " สะกดต่างกันแค่ตัวพิมพ์เล็ก-ใหญ่ — ถ้าตั้งใจให้เป็นค่าเดียวกัน ต้องพิมพ์ให้เหมือนกันทุกแถว ไม่งั้นระบบอาจมองเป็นคนละตัวเลือก ทำให้ตัวเลือกไม่ครบ matrix",
+            group.join(", "));
+        });
+
         if (Object.keys(combos).length !== expected || matrixRows.length !== expected) {
+          var matrixRowRange = matrixRows.length > 1
+            ? "แถว " + matrixRows[0].excelRow + "–" + matrixRows[matrixRows.length - 1].excelRow
+            : "แถว " + matrixRows[0].excelRow;
           add(matrixRows[0].excelRow, "error", COL.OPT2_VALUE,
             "ตัวเลือกสินค้าของสินค้า \"" + run.name + "\" ไม่ครบตาม matrix — ต้องมี " + expected +
             " แถว (ตัวเลือกหลัก " + d1Count + " ค่า × ตัวเลือกรอง " + d2Count + " ค่า) แต่พบ " + matrixRows.length + " แถว",
-            Object.keys(d1).join(", ") + " × " + Object.keys(d2).join(", "));
+            Object.keys(d1).join(", ") + " × " + Object.keys(d2).join(", "),
+            matrixRowRange);
 
           // Build a ready-to-paste replacement block for this product: reuse
           // each existing row as-is where its combo already exists, and
@@ -853,7 +893,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
             opt2List.forEach(function (v2) {
               var existing = rowByCombo[v1 + "|" + v2];
               if (existing) {
-                fixRows.push({ cells: existing.row.slice(), note: "จากไฟล์เดิม (แถว " + existing.excelRow + ")" });
+                fixRows.push({ cells: existing.row.slice() });
                 return;
               }
               var cells = templateRow.slice();
@@ -861,7 +901,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
               cells[COL.OPT2_VALUE] = v2;
               if (COL.SKU !== -1) cells[COL.SKU] = "";
               if (COL.OPT1_IMG !== -1) cells[COL.OPT1_IMG] = opt1ImgByValue[v1] || "";
-              fixRows.push({ cells: cells, note: "แถวใหม่ที่ต้องเติม (" + v1 + " × " + v2 + ")" });
+              fixRows.push({ cells: cells });
             });
           });
           matrixFixes.push({ name: run.name, expected: expected, found: matrixRows.length, rows: fixRows });
@@ -1046,9 +1086,6 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         if (sku.length > 100) add(er, "error", COL.SKU, "รหัส SKU ยาวเกิน 100 ตัวอักษร (พบ " + sku.length + " ตัวอักษร)", sku);
         if (/ {2,}/.test(sku)) add(er, "error", COL.SKU, "คอลัมน์ \"รหัส SKU\" เว้นวรรคได้ครั้งละ 1 ช่องเท่านั้น", sku);
       }
-      if (sku && skuRows[sku] && skuRows[sku].length > 1) {
-        add(er, "warning", COL.SKU, "รหัส SKU ซ้ำกับแถวอื่น (แถว " + skuRows[sku].filter(function (x) { return x !== er; }).join(", ") + ")", sku);
-      }
     });
 
     issues.forEach(function (iss) {
@@ -1072,7 +1109,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     return {
       totalChecked: checkedRows,
       errorCount: errDataRows.size,
-      warningOnlyCount: new Set(Array.from(warnDataRows).filter(function (r) { return !errDataRows.has(r); })).size,
+      warningCount: warnDataRows.size,
       passCount: passRows,
       issues: issues.sort(function (a, b) { return a.row - b.row; }),
       headers: headers,
@@ -1114,6 +1151,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       if (nowExpanded) expandedCellKeys.add(key);
       else expandedCellKeys.delete(key);
     }
+    var toggleBtn = td.querySelector(".expand-toggle");
+    if (toggleBtn) toggleBtn.textContent = nowExpanded ? "ย่อ" : "ดูทั้งหมด";
   });
 
   var currentIssues = [];
@@ -1242,7 +1281,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     currentIssues = result.issues;
     document.getElementById("stat-total").textContent = result.totalChecked;
     document.getElementById("stat-err").textContent = result.errorCount;
-    document.getElementById("stat-warn").textContent = result.warningOnlyCount;
+    document.getElementById("stat-warn").textContent = result.warningCount;
     document.getElementById("stat-ok").textContent = result.passCount;
     resultsEl.style.display = "";
     exportBtn.disabled = currentIssues.length === 0;
@@ -1321,12 +1360,25 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       msgTd.className = "msg expandable";
       var msgSpan = document.createElement("span");
       msgSpan.className = "clamp";
-      msgSpan.textContent = iss.message;
+      if (iss.rangeLabel) {
+        var rangeEl = document.createElement("b");
+        rangeEl.style.color = "var(--err)";
+        rangeEl.textContent = iss.rangeLabel;
+        msgSpan.appendChild(rangeEl);
+        msgSpan.appendChild(document.createElement("br"));
+      }
+      msgSpan.appendChild(document.createTextNode(iss.message));
       msgTd.appendChild(msgSpan);
       msgTd.title = "คลิกเพื่อดูเต็ม/ย่อ";
       var msgKey = "msg:" + iss.row + ":" + iss.colIdx + ":" + iss.message;
       msgTd.dataset.cellKey = msgKey;
-      if (expandedCellKeys.has(msgKey)) msgTd.classList.add("expanded");
+      var msgExpanded = expandedCellKeys.has(msgKey);
+      if (msgExpanded) msgTd.classList.add("expanded");
+      var msgToggleBtn = document.createElement("button");
+      msgToggleBtn.type = "button";
+      msgToggleBtn.className = "expand-toggle";
+      msgToggleBtn.textContent = msgExpanded ? "ย่อ" : "ดูทั้งหมด";
+      msgTd.appendChild(msgToggleBtn);
       tr.appendChild(msgTd);
 
       var rowData = rowByExcelRow[iss.row] || [];
@@ -1424,7 +1476,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   exportBtn.addEventListener("click", async function () {
     var lines = [["แถว", "ชื่อสินค้า", "ระดับ", "ชื่อคอลัมน์ที่พบ", "ค่าที่พบ", "ปัญหาที่พบ"].join(",")];
     currentIssues.forEach(function (iss) {
-      var cells = [iss.row, iss.product, iss.severity, iss.column, iss.value, iss.message].map(function (v) {
+      var msg = iss.rangeLabel ? "(" + iss.rangeLabel + ") " + iss.message : iss.message;
+      var cells = [iss.row, iss.product, iss.severity, iss.column, iss.value, msg].map(function (v) {
         return '"' + String(v).replace(/"/g, '""') + '"';
       });
       lines.push(cells.join(","));
@@ -1483,15 +1536,11 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   matrixFixBtn.addEventListener("click", async function () {
     if (!currentMatrixFixes.length) return;
     var headerRow = currentHeaders.slice();
-    var noteColIdx = headerRow.length;
-    headerRow.push("หมายเหตุจากตัวตรวจ (ลบคอลัมน์นี้ก่อนคัดลอกไปเทมเพลตจริง)");
     var aoaOut = [headerRow];
     currentMatrixFixes.forEach(function (fix, fixIdx) {
       if (fixIdx > 0) aoaOut.push([]); // blank row between products
       fix.rows.forEach(function (r) {
-        var line = r.cells.slice();
-        line[noteColIdx] = fix.name + " — " + r.note;
-        aoaOut.push(line);
+        aoaOut.push(r.cells.slice());
       });
     });
 
