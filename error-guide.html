@@ -1,0 +1,1243 @@
+<title>คู่มือ Error — Bulk Upload</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Sarabun:wght@400;500;600&display=swap"
+/>
+
+<style>
+  :root {
+    --ground: #f4f3ef;
+    --surface: #ffffff;
+    --surface-sunk: #edece7;
+    --ink: #1f2937;
+    --ink-soft: #4b5361;
+    --muted: #6a7183;
+    --hair: #d9d8d2;
+    --hair-soft: #e6e5e0;
+    --accent: #1b34e6;
+    --accent-soft: #e8eafd;
+    --danger: #c4232c;
+    --danger-ground: #ffe2e2;
+    --danger-edge: #fb2c36;
+    --warn: #8a5a00;
+    --warn-ground: #fbf0d9;
+
+    --f-display: 'IBM Plex Sans Thai', 'Noto Sans Thai', system-ui, sans-serif;
+    --f-body: 'Sarabun', 'IBM Plex Sans Thai', system-ui, sans-serif;
+    --f-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --ground: #15171d;
+      --surface: #1c1f27;
+      --surface-sunk: #23262f;
+      --ink: #e8eaf0;
+      --ink-soft: #c3c8d4;
+      --muted: #8d95a6;
+      --hair: #333845;
+      --hair-soft: #292d38;
+      --accent: #93a4ff;
+      --accent-soft: #232842;
+      --danger: #ff8c92;
+      --danger-ground: #3a1f22;
+      --danger-edge: #b8434b;
+      --warn: #e0b463;
+      --warn-ground: #352c18;
+    }
+  }
+
+  :root[data-theme='dark'] {
+    --ground: #15171d;
+    --surface: #1c1f27;
+    --surface-sunk: #23262f;
+    --ink: #e8eaf0;
+    --ink-soft: #c3c8d4;
+    --muted: #8d95a6;
+    --hair: #333845;
+    --hair-soft: #292d38;
+    --accent: #93a4ff;
+    --accent-soft: #232842;
+    --danger: #ff8c92;
+    --danger-ground: #3a1f22;
+    --danger-edge: #b8434b;
+    --warn: #e0b463;
+    --warn-ground: #352c18;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 15px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 40px 24px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 46px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--f-display);
+    text-wrap: balance;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .kicker {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .masthead h1 {
+    font-size: clamp(28px, 4.6vw, 42px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .standfirst {
+    font-size: 16.5px;
+    color: var(--ink-soft);
+    max-width: 60ch;
+  }
+
+  /* ---------- alert callout ---------- */
+  .callout {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    padding: 16px 18px;
+    background: var(--warn-ground);
+    border-left: 3px solid var(--warn);
+  }
+  .callout .mark {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 13.5px;
+    color: var(--warn);
+    white-space: nowrap;
+  }
+  .callout p {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--ink-soft);
+  }
+  .callout p + p {
+    margin-top: 10px;
+  }
+
+  /* ---------- pipeline ---------- */
+  .pipeline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: stretch;
+  }
+  .stagechip {
+    flex: 1 1 158px;
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .stagechip .n {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+  }
+  .stagechip .t {
+    font-family: var(--f-display);
+    font-weight: 600;
+    font-size: 14.5px;
+  }
+  .stagechip .d {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ---------- sections ---------- */
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .sechead {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 10px;
+  }
+  .sechead .eyebrow {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .sechead h2 {
+    font-size: 23px;
+    font-weight: 700;
+  }
+  .sechead p {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    max-width: 68ch;
+  }
+
+  /* ---------- fact list ---------- */
+  .facts {
+    display: flex;
+    flex-direction: column;
+  }
+  .fact {
+    display: grid;
+    grid-template-columns: minmax(150px, 200px) 1fr;
+    gap: 8px 22px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--hair-soft);
+    align-items: start;
+  }
+  .fact:first-child {
+    border-top: 1px solid var(--hair-soft);
+  }
+  .fact dt {
+    font-family: var(--f-display);
+    font-weight: 600;
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+  .fact dd {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .fact dd > * + * {
+    margin-top: 8px;
+  }
+
+  /* ---------- rule rows ---------- */
+  .rules {
+    display: flex;
+    flex-direction: column;
+  }
+  .rule {
+    display: grid;
+    grid-template-columns: 46px 1fr;
+    gap: 4px 18px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--hair-soft);
+  }
+  .rule:first-child {
+    border-top: 1px solid var(--hair);
+  }
+  .ord {
+    font-family: var(--f-mono);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent);
+    padding-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .rulebody {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+  .rulehead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 12px;
+  }
+  .rulehead h3 {
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .scope {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    color: var(--muted);
+    background: var(--surface-sunk);
+  }
+  .scope.row {
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .trigger {
+    font-size: 14px;
+    color: var(--ink-soft);
+    max-width: 72ch;
+    margin: 0;
+  }
+  .trigger code,
+  .fact code,
+  .callout code,
+  td code,
+  .note code,
+  .check code {
+    font-family: var(--f-mono);
+    font-size: 12.5px;
+    background: var(--surface-sunk);
+    padding: 1px 5px;
+    color: var(--ink);
+  }
+
+  /* กล่องข้อความ error — เลียนแบบแบนเนอร์จริงในหน้าจอ */
+  .msg {
+    background: var(--danger-ground);
+    border: 1px solid var(--danger-edge);
+    padding: 8px 12px;
+    font-family: var(--f-display);
+    font-size: 13.5px;
+    color: var(--danger);
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+  .msglist {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .note {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .note b {
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+
+  /* ---------- tables ---------- */
+  .tablewrap {
+    overflow-x: auto;
+    border: 1px solid var(--hair);
+    background: var(--surface);
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13.5px;
+  }
+  th,
+  td {
+    text-align: left;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--hair-soft);
+    vertical-align: top;
+  }
+  thead th {
+    font-family: var(--f-display);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--surface);
+    background: var(--ink);
+    border-bottom: none;
+    white-space: nowrap;
+  }
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+  td.num,
+  th.num {
+    font-family: var(--f-mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  td.hdr {
+    font-family: var(--f-display);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  td.code {
+    font-family: var(--f-mono);
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--f-display);
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 1px 7px;
+    white-space: nowrap;
+  }
+  .tag.req {
+    color: var(--danger);
+    background: var(--danger-ground);
+  }
+  .tag.opt {
+    color: var(--muted);
+    background: var(--surface-sunk);
+  }
+  .tag.cond {
+    color: var(--warn);
+    background: var(--warn-ground);
+  }
+
+  /* ---------- ข้อสังเกต ---------- */
+  .checks {
+    display: flex;
+    flex-direction: column;
+  }
+  .check {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 14px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--hair-soft);
+  }
+  .check:first-child {
+    border-top: 1px solid var(--hair);
+  }
+  .check .flag {
+    font-family: var(--f-display);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 9px;
+    height: fit-content;
+    margin-top: 4px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .check h4 {
+    font-size: 15.5px;
+    font-weight: 600;
+  }
+  .check p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: var(--ink-soft);
+    max-width: 72ch;
+  }
+
+  footer {
+    border-top: 1px solid var(--hair);
+    padding-top: 18px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 620px) {
+    .fact {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+    .rule {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .ord {
+      padding-top: 0;
+    }
+  }
+
+  .backlink { margin: 0 0 4px; }
+  .backlink a { color: var(--muted); font-size: 13px; text-decoration: none; }
+  .backlink a:hover { color: var(--accent); text-decoration: underline; }
+
+  .search-bar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--ground);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--hair);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .search-bar input {
+    flex: 1 1 260px;
+    max-width: 420px;
+    border: 1px solid var(--hair);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 14px;
+    font-family: var(--f-body);
+  }
+  .search-bar input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .search-count { font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+  .search-empty { color: var(--muted); font-size: 14px; padding: 4px 0 0; }
+  .search-empty[hidden] { display: none; }
+  mark.hit { background: var(--warn-ground); color: inherit; border-radius: 2px; padding: 0 1px; }
+</style>
+
+<div class="page">
+  <p class="backlink"><a href="index.html">&larr; กลับไปหน้าตรวจไฟล์</a></p>
+  <header class="masthead">
+    <div class="kicker">Seller - Bulk import products</div>
+    <h1>นำเข้าสินค้า — Import Validation Spec</h1>
+    <p>
+      รวมทุกเงื่อนไขที่ระบบใช้ตรวจไฟล์ Excel / CSV ตอนนำเข้าสินค้า เรียงตามลำดับที่ระบบตรวจจริง พร้อมข้อความ error
+      ที่จะแสดงในแต่ละกรณี
+    </p>
+  </header>
+
+  <div class="callout">
+    <span class="mark">READ FIRST</span>
+    <div>
+      <p>
+        <b>ระบบหยุดตรวจทันทีที่เจอ error แรก</b> — ฟังก์ชันตรวจสอบจะ return ออกทันทีเมื่อเงื่อนไขข้อใดข้อหนึ่งไม่ผ่าน
+      </p>
+      <p>
+        แบนเนอร์จะขึ้นบรรทัด <b>แถวที่ N</b> เฉพาะเงื่อนไขที่ตรวจระดับแถวเท่านั้น โดย N คือเลขแถวจริงในไฟล์ที่ผู้ขายเห็น
+        (นับจาก 1) แถวว่างที่แทรกกลางชีตจะถูกข้ามตอนนับจำนวนรายการ แต่ไม่ทำให้เลขแถวที่รายงานเพี้ยน
+      </p>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <input type="search" id="err-search" placeholder="ค้นหา error, ข้อความ, คอลัมน์…" aria-label="ค้นหาในคู่มือ" />
+    <span class="search-count" id="err-search-count"></span>
+  </div>
+  <p class="search-empty" id="err-search-empty" hidden>ไม่พบผลลัพธ์ที่ตรงกับคำค้นหา</p>
+
+  <section>
+    <div class="sechead">
+      <span class="eyebrow">The flow</span>
+      <h2>Five stages, front to back</h2>
+    </div>
+    <div class="pipeline">
+      <div class="stagechip">
+        <span class="n">STAGE 1</span>
+        <span class="t">เลือกหมวดหมู่</span>
+        <span class="d">ต้องครบ 3 ระดับ เป็นด่านแรกที่ล็อกทุกอย่างไว้</span>
+      </div>
+      <div class="stagechip">
+        <span class="n">STAGE 2</span>
+        <span class="t">ดาวน์โหลดเทมเพลต</span>
+        <span class="d">.xlsx หรือ .csv สร้างตามหมวดหมู่ที่เลือก</span>
+      </div>
+      <div class="stagechip">
+        <span class="n">STAGE 3</span>
+        <span class="t">อัปโหลด · อ่านไฟล์</span>
+        <span class="d">เช็คนามสกุล แล้วแปลงชีตเป็นตารางข้อความ</span>
+      </div>
+      <div class="stagechip">
+        <span class="n">STAGE 4</span>
+        <span class="t">ตรวจสอบข้อมูล</span>
+        <span class="d">16 เงื่อนไขเรียงลำดับ ตรวจที่ฝั่ง frontend</span>
+      </div>
+      <div class="stagechip">
+        <span class="n">STAGE 5</span>
+        <span class="t">แปลงข้อมูล · ส่ง</span>
+        <span class="d">จัดกลุ่มแถวเป็นสินค้า แล้วยิง API แบบ batch</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="eyebrow">Stage 1</span>
+      <h2>Category Selection Required</h2>
+      <p>
+        ทั้งหน้าจะใช้งานอะไรไม่ได้เลยจนกว่าจะเลือกหมวดหมู่ครบทั้ง 3 ระดับ และหมวดหมู่ที่เลือกยังเป็นตัวกำหนดว่า
+        เทมเพลตจะมีคอลัมน์เอกสาร (compliance) อะไรบ้าง และระบบจะบังคับกรอกเอกสารตัวไหน
+      </p>
+    </div>
+    <dl class="facts">
+      <div class="fact">
+        <dt>เงื่อนไขว่าเลือกครบ</dt>
+        <dd>ต้องมีครบทั้ง level 1 / level 2 / level 3 ถ้าเลือกไม่ครบ ระบบถือว่ายังไม่ได้เลือก</dd>
+      </div>
+      <div class="fact">
+        <dt>ตอนที่ยังเลือกไม่ครบ</dt>
+        <dd>
+          ปุ่มดาวน์โหลดทั้งสองปุ่มถูก disable, กล่องอัปโหลดถูก disable และจางลง พร้อมข้อความ
+          <code>กรุณาเลือกหมวดหมู่สินค้าก่อนอัปโหลดไฟล์</code>
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>เมื่อเปลี่ยนหมวดหมู่</dt>
+        <dd>
+          <b>ล้างค่าทั้งหมด</b> — ทั้งไฟล์ที่เลือกไว้ ข้อมูลที่อ่านมาแล้ว แบนเนอร์ error และสถานะการนำเข้าที่ค้างอยู่
+          เคส regression: อัปโหลดไฟล์ที่ผ่านแล้วสลับหมวดหมู่ ต้องเห็นว่าชิปชื่อไฟล์หายไปและปุ่มนำเข้ากลับไปเป็น disable
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="eyebrow">Stage 2</span>
+      <h2>Generated Template Details</h2>
+      <p>ระบบรับเฉพาะไฟล์ที่มีหน้าตาตรงกับเทมเพลตนี้ โครงสร้างของเทมเพลตจึงถือเป็นส่วนหนึ่งของกติกาการตรวจสอบ</p>
+    </div>
+    <dl class="facts">
+      <div class="fact">
+        <dt>แถวคงที่ 1–4</dt>
+        <dd>
+          แถว 1 = ชื่อคอลัมน์ · แถว 2 = ป้ายบังคับ/ไม่บังคับ (<code>บังคับ*</code> / <code>ไม่บังคับ</code> /
+          <code>บังคับตามเงื่อนไข</code>) · แถว 3 = คำอธิบายของแต่ละคอลัมน์ · แถว 4 = ตัวอย่างข้อมูล (ตัวสีเทา)
+          <b>ข้อมูลสินค้าเริ่มที่แถว 5</b> และในช่องตัวอย่างของคอลัมน์หมวดหมู่จะมีหมายเหตุสีแดงว่า
+          <code>* เริ่มใส่ข้อมูลสินค้า บรรทัดที่ 5</code>
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>คอลัมน์เอกสาร</dt>
+        <dd>
+          แทรกต่อจากคอลัมน์รูปสุดท้าย (<code>ภาพ 9</code>) ชื่อคอลัมน์คือชื่อเอกสารตามด้วยประเภท —
+          <code>(link file)</code> สำหรับแบบแนบไฟล์ และ <code>(text)</code> สำหรับแบบกรอกข้อความ ระบบสร้างเฉพาะเอกสาร
+          <b>ที่บังคับ</b> เท่านั้น เอกสารที่ไม่บังคับจะไม่ถูกเขียนลงเทมเพลตเลย
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>Dropdown หมวดหมู่ (เฉพาะ .xlsx)</dt>
+        <dd>
+          ช่องหมวดหมู่ตั้งแต่แถว 5–504 ถูกล็อกให้เลือกได้ค่าเดียว คือ path เต็ม
+          <code>level1/level2/level3</code> ถ้าพิมพ์เองเป็นค่าอื่น Excel จะเด้ง error ของตัวเองว่า
+          <code>หมวดหมู่ไม่ถูกต้อง / กรุณาเลือกหมวดหมู่จากรายการที่กำหนด</code>
+          ส่วน CSV ไม่มี dropdown
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>กรณีสร้างเทมเพลตไม่สำเร็จ</dt>
+        <dd>ขึ้น toast <code>สร้างเทมเพลตไม่สำเร็จ</code> และไม่มีไฟล์ถูกบันทึก</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="eyebrow">Stage 3</span>
+      <h2>File Validation & Parsing</h2>
+      <p>
+        มี 2 กรณีที่พังได้ก่อนจะเข้าสู่การตรวจเงื่อนไข ทั้งคู่แสดงในแบนเนอร์สีแดงเดียวกับ error ปกติ แต่
+        <b>ไม่มีเลขแถว</b>
+      </p>
+    </div>
+    <dl class="facts">
+      <div class="fact">
+        <dt>นามสกุลที่รองรับ</dt>
+        <dd>
+          รับเฉพาะ <code>.csv</code> และ <code>.xlsx</code> ครั้งละ 1 ไฟล์ นอกเหนือจากนี้ (รวมถึง <code>.xls</code>)
+          จะถูกปฏิเสธตั้งแต่กล่องอัปโหลด โดยยังแสดงชื่อไฟล์ที่ถูกปฏิเสธในชิปให้ผู้ขายเห็นว่าเลือกอะไรไป
+          <div class="msg">ประเภทไฟล์ไม่ถูกต้อง รองรับเฉพาะไฟล์ .csv และ .xlsx</div>
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>ไฟล์อ่านไม่ได้</dt>
+        <dd>
+          เกิด exception ระหว่างอ่านไฟล์ เช่น ไฟล์เสีย ไฟล์ที่ใส่รหัสผ่านไว้ หรือข้อมูลอ่านไม่ออก
+          <div class="msg">ไม่สามารถอ่านไฟล์ได้ กรุณาตรวจสอบไฟล์</div>
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>อ่านชีตไหน</dt>
+        <dd>
+          อ่าน <b>เฉพาะชีตแรก</b> เท่านั้น ถ้าผู้ขายกรอกข้อมูลไว้ในชีตที่ 2 จะได้ error เรื่องเทมเพลตไม่ถูกต้อง
+          หรือไม่พบข้อมูล
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="eyebrow">Stage 4 · เงื่อนไขทั้ง 16 ข้อ เรียงตามลำดับที่ระบบตรวจ</span>
+      <h2>Validation rules</h2>
+      <p>
+        ข้อ 1–7 ตรวจระดับไฟล์ และหยุดทันทีที่เจอปัญหาเชิงโครงสร้างข้อแรก ส่วนข้อ 8–16 ตรวจระดับแถว โดยแต่ละข้อจะไล่ตรวจ
+        <b>ครบทุกแถว</b> ก่อนจะขึ้นข้อถัดไป ดังนั้น error เรื่องความยาวที่แถว 11 จะขึ้นก่อน error เรื่องราคาที่แถว 6
+      </p>
+    </div>
+
+    <div class="rules">
+      <div class="rule">
+        <div class="ord">01</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>ไฟล์มีน้อยกว่า 4 แถว</h3>
+            <span class="scope">ระดับไฟล์</span>
+          </div>
+          <p class="trigger">ในชีตไม่มีแม้แต่แถวคงที่ 4 แถวของเทมเพลต</p>
+          <div class="msg">ไฟล์เทมเพลตไม่ถูกต้อง กรุณาใช้เทมเพลตที่ดาวน์โหลดจากระบบ</div>
+          <p class="note">ไม่มีเลขแถว เทสด้วยไฟล์เปล่า และไฟล์ที่มีแค่แถวหัวตาราง</p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">02</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>แถวคงที่ 4 แถวแรกถูกลบข้อมูล</h3>
+            <span class="scope row">แถว 1–4</span>
+          </div>
+          <p class="trigger">แถวใดแถวหนึ่งใน 1–4 ว่างทั้งแถว ดักเคสที่ผู้ขายลบแถวคำอธิบายทิ้งเพื่อ "จัดชีตให้สะอาด"</p>
+          <div class="msg">ไฟล์เทมเพลตไม่ถูกต้อง กรุณาใช้เทมเพลตที่ดาวน์โหลดจากระบบ (ห้ามแก้ไขหรือลบ 4 แถวแรก)</div>
+          <p class="note">
+            รายงานแถวแรกที่ผิด (ค่า 1–4) ข้อควรรู้: ดักได้เฉพาะแถวที่ว่าง <b>ทั้งแถว</b> เท่านั้น ถ้าแก้ข้อความในแถว 2
+            หรือ 3 จะยังผ่าน
+          </p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">03</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>ไม่มีคอลัมน์บังคับ</h3>
+            <span class="scope">ระดับไฟล์</span>
+          </div>
+          <p class="trigger">
+            หาชื่อคอลัมน์ที่อยู่ในชุดบังคับไม่เจอในแถวที่ 1 การเทียบจะยุบช่องว่างซ้ำให้เหลือช่องเดียวและตัดหัวท้ายก่อน
+            แต่นอกจากนั้นต้อง <b>ตรงเป๊ะและแยกตัวพิมพ์เล็กใหญ่</b>
+          </p>
+          <div class="msg">ไฟล์เทมเพลตไม่ถูกต้อง ไม่พบคอลัมน์ "ชื่อสินค้า"</div>
+          <p class="note">
+            คอลัมน์บังคับ: หมวดหมู่ · ชื่อสินค้า · คำอธิบายสินค้า · ภาพหลัก · น้ำหนักพัสดุ(g) · ราคาขาย (บาท) · ปริมาณ —
+            ส่วนการลบคอลัมน์ที่ <i>ไม่บังคับ</i> ทิ้งนั้นทำได้และจะผ่าน
+          </p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">04</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>ไม่มีคอลัมน์เอกสารที่จำเป็น (Required Compliance)</h3>
+            <span class="scope">ระดับไฟล์</span>
+          </div>
+          <p class="trigger">
+            เอกสารบังคับของหมวดหมู่ที่เลือกแต่ละตัว ต้องมีชื่อคอลัมน์ที่ <b>มีคำนั้นอยู่ข้างใน</b> เป็นการเทียบแบบ
+            substring ดังนั้นส่วนต่อท้าย <code>(text)</code> / <code>(link file)</code> ไม่มีผล
+          </p>
+          <div class="msg">ไฟล์เทมเพลตไม่ถูกต้อง ไม่พบคอลัมน์เอกสารที่จำเป็น "เลข อย."</div>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">05</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>มีคอลัมน์แปลกปลอม</h3>
+            <span class="scope">ระดับไฟล์</span>
+          </div>
+          <p class="trigger">
+            มีชื่อคอลัมน์ที่ไม่ว่าง แต่ไม่ใช่คอลัมน์มาตรฐานของเทมเพลตและไม่ใช่ชื่อเอกสารที่คาดหวัง
+            คอลัมน์ที่ผู้ขายเพิ่มเอง เช่น "หมายเหตุ" หรือ "ต้นทุน" จะไม่ผ่านข้อนี้
+          </p>
+          <div class="msg">ไฟล์เทมเพลตไม่ถูกต้อง (พบคอลัมน์ "หมายเหตุ" ที่ไม่อยู่ในเทมเพลตของหมวดหมู่นี้)</div>
+          <p class="note">
+            ช่องหัวตารางที่ว่างจะถูกข้าม คอลัมน์ว่างท้ายตารางจึงไม่มีปัญหา และเนื่องจาก
+            <b>หน้าจอส่งเฉพาะเอกสารบังคับเข้าไปให้ตัวตรวจสอบ</b>
+            คอลัมน์เอกสารแบบไม่บังคับที่ผู้ขายเพิ่มเองก็จะติดที่ข้อนี้เช่นกัน
+          </p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">06</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>ไม่มีข้อมูลสินค้า</h3>
+            <span class="scope">ระดับไฟล์</span>
+          </div>
+          <p class="trigger">หลังตัดแถวว่างออกแล้ว ไม่เหลือแถวข้อมูลใต้แถวที่ 4 เลย</p>
+          <div class="msg">ไม่พบข้อมูลสินค้าในไฟล์ กรุณากรอกข้อมูลอย่างน้อย 1 รายการ</div>
+          <p class="note">เทสด้วยเทมเพลตที่เพิ่งดาวน์โหลดมาโดยยังไม่กรอกอะไร ต้องตกที่ข้อนี้พอดี</p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">07</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>เกิน 500 รายการต่อไฟล์</h3>
+            <span class="scope">ระดับไฟล์</span>
+          </div>
+          <p class="trigger">จำนวนแถวข้อมูลที่ไม่ว่างเกิน <code>MAX_DATA_ROWS = 500</code> โดยแถวว่างไม่ถูกนับรวม</p>
+          <div class="msg">นำเข้าได้สูงสุด 500 รายการต่อครั้ง (พบ 501 รายการ)</div>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">08</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>สินค้า 1 รายการมีเกิน 400 SKU</h3>
+            <span class="scope row">ระดับแถว</span>
+          </div>
+          <p class="trigger">
+            ระบบจัดกลุ่มแถวด้วยชื่อสินค้า: จะเริ่มกลุ่มใหม่เมื่อช่องชื่อสินค้าไม่ว่างและต่างจากชื่อของกลุ่มปัจจุบัน
+            ถ้าชื่อ <b>ว่าง</b> ถือว่าอยู่กลุ่มเดิม และถ้าใส่ชื่อซ้ำเดิมก็ถือว่าอยู่กลุ่มเดิมเช่นกัน
+          </p>
+          <div class="msg">สินค้า 1 รายการสามารถมี SKU ได้สูงสุด 400 SKU</div>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">09</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>ช่องที่บังคับถูกเว้นว่าง</h3>
+            <span class="scope row">ระดับแถว</span>
+          </div>
+          <p class="trigger">
+            คอลัมน์บังคับข้อใดข้อหนึ่งใน 7 คอลัมน์ว่าง (หรือมีแต่ช่องว่าง) ในแถวข้อมูล
+            ไล่ตรวจทีละคอลัมน์ตามลำดับที่อยู่ในเทมเพลต
+          </p>
+          <div class="msg">คอลัมน์ "ราคาขาย (บาท)" ห้ามเว้นว่าง</div>
+          <p class="note">ใช้กับ <b>ทุกแถวข้อมูล</b> รวมถึงแถวตัวเลือกที่ต่อจากแถวแรกของสินค้าเดียวกันด้วย —</p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">10</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>ค่าหมวดหมู่ไม่ตรงกับที่เลือกไว้</h3>
+            <span class="scope row">ระดับแถว</span>
+          </div>
+          <p class="trigger">
+            ช่องหมวดหมู่ต้องเท่ากับ path ที่เลือก เชื่อมด้วย <code>/</code> เช่น
+            <code>แฟชั่น/เสื้อผ้าผู้หญิง/เสื้อยืด</code> โดยเทียบแบบยุบช่องว่างซ้ำก่อน
+          </p>
+          <div class="msg">คอลัมน์ "หมวดหมู่" ไม่ถูกต้อง กรุณาเลือกหมวดหมู่จากรายการที่กำหนด</div>
+          <p class="note">
+            ถ้าช่องว่าง ข้อนี้จะ <i>ข้ามไป</i> — แต่ข้อ 9 ดักไปแล้ว ค่าว่างจึงขึ้นเป็น ห้ามเว้นว่าง เสมอ
+          </p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">11</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>ความยาวข้อความ</h3>
+            <span class="scope row">ระดับแถว</span>
+          </div>
+          <p class="trigger">
+            ตรวจเฉพาะช่องที่มีค่า นับจากข้อความที่ตัดช่องว่างหัวท้ายแล้ว นับเป็นจำนวนตัวอักษร (อักษรไทยนับเป็น 1
+            ตัวเท่ากัน)
+          </p>
+          <div class="msglist">
+            <div class="msg">คอลัมน์ "ชื่อสินค้า" ต้องมีอย่างน้อย 15 ตัวอักษร</div>
+            <div class="msg">คอลัมน์ "ชื่อสินค้า" ต้องไม่เกิน 255 ตัวอักษร</div>
+          </div>
+          <p class="note">
+            limit: ชื่อสินค้า 15–255 · คำอธิบายสินค้า ≤ 10,000 · รหัส SKU ≤ 100 · คอลัมน์ชื่อ/ค่าตัวเลือกทั้ง 4 คอลัมน์
+            ≤ 20
+          </p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">12</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>รูปแบบข้อมูล — จำนวนเต็มและ URL</h3>
+            <span class="scope row">ระดับแถว</span>
+          </div>
+          <p class="trigger">
+            คอลัมน์ที่ต้องเป็นจำนวนเต็ม ต้องเป็นตัวเลขจำนวนเต็มเท่านั้น หลังจากตัดเครื่องหมาย , ออกแล้ว คอลัมน์ที่เป็น
+            URL ต้องเป็นลิงก์ที่ถูกต้อง และต้องขึ้นต้นด้วย http:// หรือ https://
+          </p>
+          <div class="msglist">
+            <div class="msg">คอลัมน์ "ปริมาณ" รูปแบบไม่ถูกต้อง กรุณาระบุเป็นจำนวนเต็ม</div>
+            <div class="msg">คอลัมน์ "ภาพหลัก" รูปแบบข้อมูลไม่ถูกต้อง</div>
+          </div>
+          <p class="note">
+            <b>กรณีที่ควรรู้:</b>
+            ค่าที่เป็น <code>-5</code>, <code>29.5</code> หรือ <code>1e3</code> จะไม่ผ่านการตรวจสอบในขั้นตอนนี้
+            และจะแสดงข้อความ "กรุณาระบุเป็นจำนวนเต็ม" ทันที <br />ส่วน <code>1,000</code> สามารถใช้ได้ เพราะระบบจะตัด ,
+            ออกก่อนตรวจสอบ <br />สำหรับคอลัมน์ URL เช่น ภาพหลัก, ภาพ 2–9 และ ตัวเลือกสินค้าหลักภาพที่ 1
+            ต้องเป็นลิงก์ที่ขึ้นต้นด้วย <code>http://</code> หรือ <code>https://</code> เท่านั้น
+          </p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">13</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>SKU มีช่องว่างติดกัน</h3>
+            <span class="scope row">ระดับแถว</span>
+          </div>
+          <p class="trigger">
+            มีอักขระช่องว่างติดกันตั้งแต่ 2 ตัวขึ้นไปที่ตำแหน่งใดก็ได้ใน SKU ที่ไม่ว่าง เว้นวรรคเดี่ยวทำได้ปกติ
+            ส่วนช่องว่างหัวท้ายถูกตัดทิ้งไปก่อนตรวจอยู่แล้ว
+          </p>
+          <div class="msg">คอลัมน์ "รหัส SKU" เว้นวรรคได้ครั้งละ 1 ช่องเท่านั้น</div>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">14</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>เกณฑ์ที่กำหนดโดยระบบ</h3>
+            <span class="scope row">ระดับแถว</span>
+          </div>
+          <p class="trigger">
+            ตรวจในแต่ละแถวตามลำดับนี้: ราคา → ปริมาณ → น้ำหนัก → ขนาดพัสดุ
+            ทุกค่าที่มาถึงตรงนี้ผ่านการเช็ครูปแบบจำนวนเต็มในข้อ 12 มาแล้ว
+          </p>
+          <div class="msglist">
+            <div class="msg">คอลัมน์ "ราคาขาย (บาท)" ต้องไม่ต่ำกว่า 1 บาท และไม่เกิน 100,000 บาท</div>
+            <div class="msg">คอลัมน์ "ปริมาณ" ต้องไม่เกิน 999,999 ชิ้น</div>
+            <div class="msg">คอลัมน์ "น้ำหนักพัสดุ(g)" ต้องมากกว่า 0 กรัม</div>
+            <div class="msg">คอลัมน์ "น้ำหนักพัสดุ(g)" ต้องไม่เกิน 50,000 กรัม</div>
+            <div class="msg">กรุณากรอกขนาดบรรจุภัณฑ์ (กว้าง × ยาว × สูง) ให้ครบทุกค่า หรือเว้นว่างทั้งหมด</div>
+            <div class="msg">คอลัมน์ "ความยาวของพัสดุ(cm)" ต้องมากกว่า 0 cm</div>
+            <div class="msg">คอลัมน์ "ความยาวของพัสดุ(cm)" ต้องไม่เกิน 150 cm</div>
+            <div class="msg">ขนาดรวม (กว้าง + ยาว + สูง) ต้องไม่เกิน 280 cm</div>
+          </div>
+          <p class="note">
+            <b>ขนาดพัสดุเป็นแบบทั้งหมดหรือไม่ใส่เลย</b> — ต้องกรอกครบทั้งยาว/กว้าง/สูง หรือเว้นว่างทั้งสามช่อง
+            ถ้ากรอกแค่ 1–2 ช่องจะไม่ผ่าน
+          </p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">15</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>ค่าของเอกสารที่จำเป็น</h3>
+            <span class="scope row">ระดับแถว</span>
+          </div>
+          <p class="trigger">
+            เอกสาร <b>บังคับ</b> ของหมวดหมู่แต่ละตัว ในทุกแถวข้อมูล ต้องไม่ว่าง และเนื้อหาต้องตรงกับประเภทของเอกสารนั้น
+          </p>
+          <div class="msglist">
+            <div class="msg">คอลัมน์ "เลข อย." ห้ามเว้นว่าง</div>
+            <div class="msg">คอลัมน์ "ใบรับรอง" ต้องเป็นลิงก์ URL ที่ถูกต้อง</div>
+            <div class="msg">คอลัมน์ "เลข อย." ต้องเป็นข้อความ ไม่ใช่ลิงก์ URL</div>
+          </div>
+          <p class="note">
+            ประเภทแนบไฟล์ต้องเป็น URL แบบ http/https ที่ถูกต้อง ส่วนประเภทข้อความต้อง <b>ไม่ใช่</b> URL สังเกตว่าข้อความ
+            error ใช้ชื่อเอกสารดิบ ๆ โดยไม่มีส่วนต่อท้าย <code>(text)</code>/<code>(link file)</code>
+            ขณะที่คอลัมน์ในไฟล์มี และบังคับกรอก <b>ทุกแถว</b> รวมถึงแถวตัวเลือกที่ต่อกัน
+          </p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="ord">16</div>
+        <div class="rulebody">
+          <div class="rulehead">
+            <h3>การจับคู่ตัวเลือกสินค้า</h3>
+            <span class="scope row">ระดับแถว</span>
+          </div>
+          <p class="trigger">
+            ในแต่ละแถว: ชื่อตัวเลือกหลักกับค่าตัวเลือกหลักต้องมาคู่กันหรือว่างทั้งคู่ ถ้าไม่มีตัวเลือกหลัก
+            แถวนั้นถือเป็นสินค้าเดี่ยว คอลัมน์ที่ผูกกับตัวเลือกจึงต้องว่างทั้งหมด แต่ถ้ามีตัวเลือกหลัก
+            ชื่อ/ค่าของตัวเลือกรองก็ต้องมาคู่กันหรือว่างทั้งคู่เช่นกัน
+          </p>
+          <div class="msglist">
+            <div class="msg">กรุณากรอกทั้งชื่อตัวเลือกสินค้าหลักและค่าตัวเลือกสินค้าหลัก หรือเว้นว่างทั้งคู่</div>
+            <div class="msg">สินค้าที่ไม่มีตัวเลือกสินค้าหลักต้องเว้นว่างคอลัมน์ "ตัวเลือกสินค้าหลักภาพที่ 1"</div>
+            <div class="msg">กรุณากรอกทั้งชื่อตัวเลือกสินค้ารองและค่าตัวเลือกสินค้ารอง หรือเว้นว่างทั้งคู่</div>
+            <div class="msg">ตัวเลือกสินค้าไม่ถูกต้อง</div>
+          </div>
+          <p class="note">
+            3 คอลัมน์ที่ต้องว่างในแถวสินค้าเดี่ยว: ตัวเลือกสินค้าหลักภาพที่ 1 · ชื่อตัวเลือกสินค้ารอง ·
+            ค่าตัวเลือกสินค้ารอง — ตรวจตามลำดับนี้
+            <b>ทุกแถวตัวเลือกต้องกรอกชื่อตัวเลือกซ้ำเองด้วย</b> ไม่ใช่แค่แถวแรกของกลุ่ม
+          </p>
+          <p class="note">
+            <b>"ตัวเลือกสินค้าไม่ถูกต้อง"</b> เป็นข้อความที่เจอจริงตอนนำเข้า (ทดสอบยืนยันแล้วใน UAT) ครอบคลุมกรณี
+            <b>ตัวเลือกไม่ครบตาม matrix</b> ด้วย ไม่ใช่แค่กรณีคู่ชื่อ/ค่าขาดหายอย่างเดียว — เช่น ประกาศ 2 สี × 2 ไซส์
+            ไว้ แต่กรอกมาไม่ครบ 4 แถว (ทุกคู่สี×ไซส์ต้องมีแถวของตัวเอง) ก็จะเจอข้อความนี้เช่นกัน
+            ให้ตรวจกับ<a href="index.html">ตัวตรวจไฟล์</a>ก่อนอัปโหลดเสมอ ตัวตรวจจะบอกละเอียดกว่าว่าสินค้าไหน ขาดคู่ไหน
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="eyebrow">Stage 5</span>
+      <h2>Submission to BE</h2>
+      <p>ขั้นนี้ทำงานตอนกดปุ่ม นำเข้าสินค้า เท่านั้น</p>
+    </div>
+    <dl class="facts">
+      <div class="fact">
+        <dt>เมื่อสำเร็จ</dt>
+        <dd>
+          ล้างไฟล์และข้อมูลที่อ่านไว้ แล้วขึ้น dialog: หัวข้อ <code>ระบบได้รับข้อมูลการนำเข้าสินค้าแล้ว</code> เนื้อหา
+          <code>การสร้างสินค้าอาจใช้เวลาสักครู่ก่อนจะแสดงในระบบ</code> ปุ่ม <code>รับทราบ</code> การนำเข้าเป็นแบบ
+          <b>asynchronous</b> สินค้าจึงอาจยังไม่ขึ้นในลิสต์ทันที
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>เมื่อไม่สำเร็จ</dt>
+        <dd>
+          ขึ้น toast <code>นำเข้าสินค้าไม่สำเร็จ</code> พร้อมข้อความที่แปลไว้ในแบนเนอร์สีแดงถ้ารู้จัก status code นั้น
+          โดย <b>ไฟล์และข้อมูลที่อ่านไว้ยังอยู่</b> ผู้ขายจึงกดลองใหม่ได้โดยไม่ต้องอัปโหลดซ้ำ
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>ลิมิตจำนวนสินค้าของร้าน</dt>
+        <dd>
+          หากจำนวนสินค้าในร้านถึงหรือเกิน 3,000 รายการ ระบบจะไม่สามารถนำเข้าสินค้าใหม่ได้ และจะแสดง Dialog แจ้งเตือน
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="eyebrow">Reference</span>
+      <h2>Column Details</h2>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ชื่อคอลัมน์</th>
+            <th>บังคับ</th>
+            <th>รูปแบบ</th>
+            <th>ความยาว</th>
+            <th>หมายเหตุ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="hdr">หมวดหมู่</td>
+            <td><span class="tag req">บังคับ</span></td>
+            <td>—</td>
+            <td class="num">—</td>
+            <td>ต้องตรงกับ path 3 ระดับที่เลือก เชื่อมด้วย <code>/</code></td>
+          </tr>
+          <tr>
+            <td class="hdr">ชื่อสินค้า</td>
+            <td><span class="tag req">บังคับ</span></td>
+            <td>—</td>
+            <td class="num">15–255</td>
+            <td>ใช้เป็นตัวจัดกลุ่มตัวเลือกด้วย</td>
+          </tr>
+          <tr>
+            <td class="hdr">คำอธิบายสินค้า</td>
+            <td><span class="tag req">บังคับ</span></td>
+            <td>—</td>
+            <td class="num">≤ 10,000</td>
+            <td>ไม่เกิน 10,000 ตัวอักษร</td>
+          </tr>
+          <tr>
+            <td class="hdr">ภาพหลัก</td>
+            <td><span class="tag req">บังคับ</span></td>
+            <td>URL</td>
+            <td class="num">—</td>
+            <td>รับเฉพาะ http/https</td>
+          </tr>
+          <tr>
+            <td class="hdr">ภาพ 2 … ภาพ 9</td>
+            <td><span class="tag opt">ไม่บังคับ</span></td>
+            <td>URL</td>
+            <td class="num">—</td>
+            <td>8 คอลัมน์ ช่องว่างจะถูกตัดออก</td>
+          </tr>
+          <tr>
+            <td class="hdr">&lt;เอกสาร&gt; (text) / (link file)</td>
+            <td><span class="tag cond">ตามหมวดหมู่</span></td>
+            <td>ข้อความ / URL</td>
+            <td class="num">—</td>
+            <td>แทรกหลังภาพ 9 มีเฉพาะเอกสารบังคับ</td>
+          </tr>
+          <tr>
+            <td class="hdr">รหัส SKU</td>
+            <td><span class="tag opt">ไม่บังคับ</span></td>
+            <td>—</td>
+            <td class="num">≤ 100</td>
+            <td>ห้ามมีช่องว่างติดกัน</td>
+          </tr>
+          <tr>
+            <td class="hdr">ชื่อตัวเลือกสินค้าหลัก</td>
+            <td><span class="tag cond">มาคู่กัน</span></td>
+            <td>—</td>
+            <td class="num">≤ 20</td>
+            <td>คู่กับ ค่าตัวเลือกสินค้าหลัก</td>
+          </tr>
+          <tr>
+            <td class="hdr">ค่าตัวเลือกสินค้าหลัก (ตัวเลือก)</td>
+            <td><span class="tag cond">มาคู่กัน</span></td>
+            <td>—</td>
+            <td class="num">≤ 20</td>
+            <td>คู่กับ ชื่อตัวเลือกสินค้าหลัก</td>
+          </tr>
+          <tr>
+            <td class="hdr">ตัวเลือกสินค้าหลักภาพที่ 1</td>
+            <td><span class="tag opt">ไม่บังคับ</span></td>
+            <td>URL</td>
+            <td class="num">—</td>
+            <td>ต้องว่างถ้าไม่มีตัวเลือกหลัก</td>
+          </tr>
+          <tr>
+            <td class="hdr">ชื่อตัวเลือกสินค้ารอง</td>
+            <td><span class="tag cond">มาคู่กัน</span></td>
+            <td>—</td>
+            <td class="num">≤ 20</td>
+            <td>ต้องมีตัวเลือกหลักก่อน</td>
+          </tr>
+          <tr>
+            <td class="hdr">ค่าตัวเลือกสินค้ารอง (ตัวเลือก)</td>
+            <td><span class="tag cond">มาคู่กัน</span></td>
+            <td>—</td>
+            <td class="num">≤ 20</td>
+            <td>ต้องมีตัวเลือกหลักก่อน</td>
+          </tr>
+          <tr>
+            <td class="hdr">น้ำหนักพัสดุ(g)</td>
+            <td><span class="tag req">บังคับ</span></td>
+            <td>จำนวนเต็ม</td>
+            <td class="num">—</td>
+            <td>มากกว่า 0 และไม่เกิน 50,000</td>
+          </tr>
+          <tr>
+            <td class="hdr">ความยาวของพัสดุ(cm)</td>
+            <td><span class="tag opt">ไม่บังคับ</span></td>
+            <td>จำนวนเต็ม</td>
+            <td class="num">—</td>
+            <td>ต้องมาพร้อมกว้าง/สูง</td>
+          </tr>
+          <tr>
+            <td class="hdr">ความกว้างของพัสดุ(cm)</td>
+            <td><span class="tag opt">ไม่บังคับ</span></td>
+            <td>จำนวนเต็ม</td>
+            <td class="num">—</td>
+            <td>ต้องมาพร้อมยาว/สูง</td>
+          </tr>
+          <tr>
+            <td class="hdr">ความสูงของพัสดุ(cm)</td>
+            <td><span class="tag opt">ไม่บังคับ</span></td>
+            <td>จำนวนเต็ม</td>
+            <td class="num">—</td>
+            <td>ต้องมาพร้อมยาว/กว้าง</td>
+          </tr>
+          <tr>
+            <td class="hdr">ราคาขาย (บาท)</td>
+            <td><span class="tag req">บังคับ</span></td>
+            <td>จำนวนเต็ม</td>
+            <td class="num">—</td>
+            <td>1 – 100,000 บาท</td>
+          </tr>
+          <tr>
+            <td class="hdr">ปริมาณ</td>
+            <td><span class="tag req">บังคับ</span></td>
+            <td>จำนวนเต็ม</td>
+            <td class="num">—</td>
+            <td>ไม่เกิน 999,999</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  </div>
+
+<script>
+(function () {
+  "use strict";
+  var input = document.getElementById("err-search");
+  var countEl = document.getElementById("err-search-count");
+  var emptyEl = document.getElementById("err-search-empty");
+
+  // Each unit's untouched markup, captured once — every search re-applies
+  // highlighting from this pristine copy instead of stacking <mark> tags
+  // from the previous keystroke onto already-marked text.
+  var originalHtml = new WeakMap();
+  function getOriginal(el) {
+    if (!originalHtml.has(el)) originalHtml.set(el, el.innerHTML);
+    return originalHtml.get(el);
+  }
+  function escapeRegExp(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+  function highlight(el, q) {
+    el.innerHTML = getOriginal(el);
+    if (!q) return;
+    var re = new RegExp("(" + escapeRegExp(q) + ")", "gi");
+    (function walk(node) {
+      var children = Array.prototype.slice.call(node.childNodes);
+      children.forEach(function (child) {
+        if (child.nodeType === 3) {
+          if (re.test(child.nodeValue)) {
+            re.lastIndex = 0;
+            var span = document.createElement("span");
+            span.innerHTML = child.nodeValue.replace(re, "<mark class=\"hit\">$1</mark>");
+            node.replaceChild(span, child);
+          }
+        } else if (child.nodeType === 1 && child.tagName !== "MARK") {
+          walk(child);
+        }
+      });
+    })(el);
+  }
+
+  function applySearch() {
+    var raw = input.value.trim();
+    var q = raw.toLowerCase();
+    var totalVisible = 0;
+    var sectionsWithUnits = 0;
+
+    document.querySelectorAll("section").forEach(function (sec) {
+      var units = sec.querySelectorAll(".rule, .fact, table tbody tr");
+      if (!units.length) {
+        // Nothing searchable in here (intro/pipeline chips) — it can never
+        // match, so hide it during an active search instead of sitting
+        // above the real results and making them look missing.
+        sec.style.display = q === "" ? "" : "none";
+        return;
+      }
+      sectionsWithUnits++;
+      var anyVisible = false;
+      units.forEach(function (el) {
+        var match = q === "" || el.textContent.toLowerCase().indexOf(q) !== -1;
+        el.style.display = match ? "" : "none";
+        highlight(el, match && q !== "" ? raw : "");
+        if (match) { anyVisible = true; totalVisible++; }
+      });
+      sec.style.display = (q !== "" && !anyVisible) ? "none" : "";
+    });
+
+    countEl.textContent = q === "" ? "" : ("พบ " + totalVisible + " ข้อ");
+    emptyEl.hidden = !(q !== "" && sectionsWithUnits > 0 && totalVisible === 0);
+  }
+
+  input.addEventListener("input", applySearch);
+})();
+</script>

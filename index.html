@@ -110,6 +110,15 @@
     line-height: 1.55;
   }
 
+  .guide-link { margin: 10px 0 0; }
+  .guide-link a {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .guide-link a:hover { text-decoration: underline; }
+
   .drop {
     display: flex;
     flex-direction: column;
@@ -145,6 +154,38 @@
     border-radius: 999px;
   }
   .drop-file:empty { display: none; }
+
+  /* Compact bar once a file is chosen — the big drag-invitation state has
+     done its job; keeping it full-size afterward just pushes the results
+     table further down the page for no reason. */
+  .drop.has-file {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 12px 18px;
+    text-align: left;
+    min-height: 56px;
+  }
+  .drop.has-file .drop-icon { width: 20px; height: 20px; margin-bottom: 0; flex-shrink: 0; }
+  .drop.has-file .drop-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 0;
+    flex-shrink: 0;
+  }
+  .drop.has-file .drop-sub { display: none; }
+  .drop.has-file .drop-file {
+    margin-top: 0;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-dim);
+    white-space: normal;
+  }
 
   .rules {
     margin-top: 14px;
@@ -452,6 +493,8 @@
       <p class="eyebrow">Bulk Upload · Template Checker</p>
       <h1>ตรวจไฟล์ Bulk Upload Product Template</h1>
       <p class="subtitle">อัปโหลดไฟล์ .xlsx ที่กรอกแล้ว ระบบตรวจตามกฎในแถวคำแนะนำของเทมเพลตจริง แล้วแสดงรายการแถวที่มีปัญหาก่อนอัปโหลดเข้าระบบ ทำงานในเบราว์เซอร์ทั้งหมด ไม่มีการส่งไฟล์ออกไปที่ใด</p>
+      <p class="guide-link"><a href="error-guide.html">📄 คู่มือ Error ไฟล์ Bulk Upload →</a></p>
+      <p class="guide-link"><a href="product-form-guide.html">📄 คู่มือ Error เพิ่มสินค้าใหม่หรือแก้ไขสินค้า →</a></p>
     </div>
   </header>
 
@@ -470,7 +513,9 @@
   <details class="rules">
     <summary>ระบบตรวจอะไรบ้าง</summary>
     <ul>
-      <li><b>Error</b> — ไฟล์เทมเพลตผิดโครงสร้าง: น้อยกว่า 4 แถวแรก, ลบ/แก้ 4 แถวแรกของเทมเพลตทิ้ง, หรือมีคอลัมน์แปลกปลอมที่ไม่ใช่คอลัมน์มาตรฐานหรือคอลัมน์เอกสาร (ระบบจริงจะปฏิเสธทั้งไฟล์ในกรณีเหล่านี้)</li>
+      <li><b>Error</b> — ไฟล์เทมเพลตผิดโครงสร้าง: น้อยกว่า 4 แถวแรก, ลบ/แก้ 4 แถวแรกของเทมเพลตทิ้ง, หรือมีคอลัมน์แปลกปลอมที่ไม่ใช่คอลัมน์มาตรฐานหรือคอลัมน์เอกสาร (ระบบจริงจะปฏิเสธทั้งไฟล์ในกรณีเหล่านี้)
+        <br>→ <i>วิธีแก้: ดาวน์โหลดเทมเพลตใหม่จากระบบ แล้วคัดลอกเฉพาะข้อมูลสินค้ามาใส่ อย่าลบ/แก้ 4 แถวแรก และอย่าเพิ่มคอลัมน์เอง</i>
+      </li>
       <li><b>Error</b> — ไม่พบข้อมูลสินค้าในไฟล์เลย</li>
       <li><b>Error</b> — คอลัมน์ที่แถว 2 ระบุ "บังคับ*" แต่ไม่มีข้อมูล (คอลัมน์คำอธิบายสินค้า ถ้ามีแต่แท็ก HTML/รูปโดยไม่มีตัวอักษรจริง ก็ถือว่าว่างเช่นกัน)</li>
       <li><b>Error</b> — ชื่อสินค้าสั้นกว่า 15 ตัวอักษร หรือยาวเกิน 255 ตัวอักษร</li>
@@ -482,9 +527,15 @@
       <li><b>Error</b> — สินค้าชื่อเดียวกัน มีค่าตัวเลือกสินค้า (ตัวเลือกหลัก + ตัวเลือกรอง) ซ้ำกันมากกว่า 1 แถว</li>
       <li><b>Error</b> — ไฟล์มีแถวข้อมูลสินค้าเกิน 500 แถว (ขีดจำกัดของเทมเพลต)</li>
       <li><b>Error</b> — สินค้าชื่อเดียวกันมี SKU (จำนวนแถว) เกิน 400 รายการ</li>
-      <li><b>Error</b> — สินค้าที่มีทั้งตัวเลือกหลักและตัวเลือกรอง แถวไม่ครบตาม matrix ของทุกคู่ตัวเลือก (เช่น 2 สี × 2 ไซส์ ต้องมี 4 แถว)</li>
-      <li><b>Error</b> — คอลัมน์เอกสารเฉพาะหมวดหมู่ (เช่น "เลข อย.", "ใบรับรอง") ว่าง หรือประเภทไม่ตรง (คอลัมน์แบบข้อความต้องไม่ใช่ลิงก์ URL, คอลัมน์แบบไฟล์แนบต้องเป็นลิงก์ URL ที่ถูกต้อง)</li>
-      <li><b>Warning</b> — URL รูปภาพไม่ได้ขึ้นต้นด้วย http, หมวดหมู่ในบางแถวไม่ตรงกับส่วนใหญ่ของไฟล์, ชื่อสินค้าซ้ำแบบไม่ติดกัน (อาจถูกระบบรวมเป็นสินค้าเดียวผิดพลาด), ค่าตัวเลือกสินค้าสะกดต่างกันแค่ตัวพิมพ์เล็ก-ใหญ่ (เช่น "Af" กับ "AF")</li>
+      <li><b>Error</b> — สินค้าที่มีทั้งตัวเลือกหลักและตัวเลือกรอง แถวไม่ครบตาม matrix ของทุกคู่ตัวเลือก (เช่น 2 สี × 2 ไซส์ ต้องมี 4 แถว)
+        <br>→ <i>วิธีแก้: กดปุ่ม "ดาวน์โหลดตัวเลือกที่ขาด" แล้ววางทับแถวเดิมของสินค้านั้น</i>
+      </li>
+      <li><b>Error</b> — คอลัมน์เอกสารเฉพาะหมวดหมู่ (เช่น "เลข อย.", "ใบรับรอง") ว่าง หรือประเภทไม่ตรง (คอลัมน์แบบข้อความต้องไม่ใช่ลิงก์ URL, คอลัมน์แบบไฟล์แนบต้องเป็นลิงก์ URL ที่ถูกต้อง)
+        <br>→ <i>วิธีแก้: กรอกให้ครบทุกแถวของสินค้านั้น — คอลัมน์ (text) ห้ามเป็นลิงก์, คอลัมน์ (link file) ต้องเป็นลิงก์ http/https</i>
+      </li>
+      <li><b>Warning</b> — URL รูปภาพไม่ได้ขึ้นต้นด้วย http, หมวดหมู่ในบางแถวไม่ตรงกับส่วนใหญ่ของไฟล์, ชื่อสินค้าซ้ำแบบไม่ติดกัน (อาจถูกระบบรวมเป็นสินค้าเดียวผิดพลาด), ค่าตัวเลือกสินค้าสะกดต่างกันแค่ตัวพิมพ์เล็ก-ใหญ่ (เช่น "Af" กับ "AF")
+        <br>→ <i>วิธีแก้ (ตัวพิมพ์เล็ก-ใหญ่): พิมพ์ค่าตัวเลือกให้เหมือนกันทุกแถวเป๊ะ ตัวพิมพ์เล็ก-ใหญ่ต้องตรงกันด้วย</i>
+      </li>
       <li>แถวที่ว่างทั้งแถวจะไม่ถูกนับและไม่ถูกตรวจ</li>
       <li class="note-src">กฎอิงตามสเปกตรวจสอบจริงของระบบ Thaimart (นำเข้าสินค้าแบบ bulk + ฟอร์มเพิ่มสินค้า) — คอลัมน์เอกสารเฉพาะหมวดหมู่ตรวจจากชื่อคอลัมน์ที่ลงท้ายด้วย "(text)"/"(link file)" เท่านั้น ไม่ได้รู้ล่วงหน้าว่าแต่ละหมวดหมู่บังคับเอกสารอะไรบ้าง</li>
     </ul>
@@ -1249,6 +1300,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   });
 
   function handleFile(file) {
+    dropEl.classList.add("has-file");
+    dropTitle.textContent = "เปลี่ยนไฟล์";
     if (!/\.xlsx$/i.test(file.name)) {
       dropFile.textContent = "รองรับเฉพาะไฟล์ .xlsx — ไฟล์ที่เลือกไม่ถูกต้อง";
       return;
